@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'mon_peit_film.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd5vjt40mq113u6',
+        'USER':'lfputzqkixhrey',
+        'HOST':'ec2-46-51-190-87.eu-west-1.compute.amazonaws.com',
+        'PASSWORD':'c054e04d6440d7b4a45fe5dbc5eb1edfde3ac9542165c784cdc055ea4d53529e',
+        'PORT': 5432
     }
 }
 
