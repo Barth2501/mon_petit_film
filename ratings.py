@@ -8,7 +8,7 @@ class Ratings:
         self._globalId = globalId
         self._rating = rating
         Ratings.ratingId += 1
-    
+
     @property
     def userId(self):
         return self._userId

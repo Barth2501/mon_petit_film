@@ -2,7 +2,7 @@ class Genre:
 
     globalId = 1
 
-    def __init__(self,name):
+    def __init__(self, name):
         self._name = name
         self._globalId = Genre.globalId
         Genre.globalId += 1
@@ -31,14 +31,15 @@ class Serie(Genre):
     @property
     def overview(self):
         return self._overview
-    
+
     @property
     def homepage(self):
         return self._homepage
-    
+
     @property
     def nbSeason(self):
         return self._nbSeason
+
 
 class Season(Serie):
 
@@ -62,16 +63,19 @@ class Season(Serie):
     def nbEpisode(self):
         return self._nbEpisode
 
+
 class Episode(Season):
 
     episodeId = 1
 
-    def __init__(self, title, overview, homepage, nbSeason, genre, seasonTitle, seasonOverview, nbEpisode, episodeTitle, runningTime):
-        Season.__init__(self, title, overview, homepage, nbSeason, genre, seasonTitle, seasonOverview, nbEpisode)
+    def __init__(self, title, overview, homepage, nbSeason, genre, seasonTitle,
+                 seasonOverview, nbEpisode, episodeTitle, runningTime):
+        Season.__init__(self, title, overview, homepage, nbSeason, genre,
+                        seasonTitle, seasonOverview, nbEpisode)
         self._episodeTitle = episodeTitle
         self._runningTime = runningTime
         self._episodeId = Episode.episodeId
-        Episode.episodeId += 1 
+        Episode.episodeId += 1
 
     @property
     def episodeTitle(self):
@@ -81,11 +85,13 @@ class Episode(Season):
     def runningtime(self):
         return self._runningTime
 
+
 class Movie(Episode):
 
     movieId = 1
 
     def __init__(self, title, runTime, overview, homePage, genre, runningTime):
-        Episode.__init__(self, title, overview, 1, homePage, genre, title, overview, 1, title, runningTime)
+        Episode.__init__(self, title, overview, 1, homePage, genre, title,
+                         overview, 1, title, runningTime)
         self._movieId = Movie.movieId
         Movie.movieId += 1

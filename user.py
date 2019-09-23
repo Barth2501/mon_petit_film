@@ -1,5 +1,6 @@
 from ratings import Ratings
 
+
 class User:
 
     userId = 1
@@ -24,6 +25,6 @@ class User:
     def _donne_note(self, rating, globalId):
         note = Ratings(self._userId, globalId, rating)
         note.save()
-    
+
     def _aime(self, globalId):
         self._likedList.append(globalId)
