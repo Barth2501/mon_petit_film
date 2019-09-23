@@ -1,4 +1,4 @@
-class Genre():
+class Genre:
 
     globalId = 1
 
@@ -16,7 +16,7 @@ class Serie(Genre):
 
     serieId = 1
 
-    def __init__(self,title, overview, homepage,nbSeason,genre):
+    def __init__(self, title, overview, homepage, nbSeason, genre):
         Genre.__init__(self, genre)
         self._title = title
         self._overview = overview
@@ -44,8 +44,8 @@ class Season(Serie):
 
     seasonId = 1
 
-    def __init__(self,title,overview,homepage,nbSeason,genre,seasonTitle,seasonOverview,nbEpisode):
-        Serie.__init__(self,title, overview, homepage,nbSeason,genre)
+    def __init__(self, title, overview, homepage, nbSeason, genre, seasonTitle, seasonOverview, nbEpisode):
+        Serie.__init__(self, title, overview, homepage, nbSeason, genre)
         self._seasonTitle = seasonTitle
         self._seasonOverview = seasonOverview
         self._nbEpisode = nbEpisode
@@ -66,10 +66,10 @@ class Episode(Season):
 
     episodeId = 1
 
-    def __init__(self,title, overview,homepage, nbSeason,genre,seasonTitle,seasonOverview,nbEpisode,episodeTitle,runningtime):
-        Season.__init__(self,title,overview,homepage,nbSeason,genre,seasonTitle,seasonOverview,nbEpisode)
+    def __init__(self, title, overview, homepage, nbSeason, genre, seasonTitle, seasonOverview, nbEpisode, episodeTitle, runningTime):
+        Season.__init__(self, title, overview, homepage, nbSeason, genre, seasonTitle, seasonOverview, nbEpisode)
         self._episodeTitle = episodeTitle
-        self._runningtime = runningtime
+        self._runningTime = runningTime
         self._episodeId = Episode.episodeId
         Episode.episodeId += 1 
 
@@ -79,13 +79,13 @@ class Episode(Season):
 
     @property
     def runningtime(self):
-        return self._runningtime
+        return self._runningTime
 
 class Movie(Episode):
 
     movieId = 1
 
-    def __init__(self,title,runtime,overview,homepage,genre,runningtime):
-        Episode.__init__(self,title,overview,1,homepage,genre,title,overview,1,title,runningtime)
+    def __init__(self, title, runTime, overview, homePage, genre, runningTime):
+        Episode.__init__(self, title, overview, 1, homePage, genre, title, overview, 1, title, runningTime)
         self._movieId = Movie.movieId
         Movie.movieId += 1

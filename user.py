@@ -1,16 +1,16 @@
-from .ratings import Ratings
+from ratings import Ratings
 
-class User():
+class User:
 
     userId = 1
-    liked_list = []
+    likedList = []
 
-    def __init__(self, username, emailAdress, password):
+    def __init__(self, username, emailAddress, password):
         self._username = username
-        self._emailAdress = emailAdress
+        self._emailAddress = emailAddress
         self._userId = User.userId
         self._password = password
-        self._liked_list = User.liked_list
+        self._likedList = User.likedList
         User.userId += 1
 
     @property
@@ -18,12 +18,12 @@ class User():
         return self._username
 
     @property
-    def emailAdress(self):
-        return self._emailAdress
+    def emailAddress(self):
+        return self._emailAddress
 
-    def _donne_note(self,rating, globalId):
-        note = Ratings(self._userId,globalId, rating)
+    def _donne_note(self, rating, globalId):
+        note = Ratings(self._userId, globalId, rating)
         note.save()
     
-    def _aime(self,globalId):
-        self._liked_list.append(globalId)
+    def _aime(self, globalId):
+        self._likedList.append(globalId)

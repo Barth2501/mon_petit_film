@@ -1,8 +1,8 @@
-class Ratings():
+class Ratings:
 
     ratingId = 1
 
-    def __init__(self,userId,globalId, rating):
+    def __init__(self, userId, globalId, rating):
         self._ratingId = Ratings.ratingId
         self._userId = userId
         self._globalId = globalId
