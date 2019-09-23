@@ -45,7 +45,8 @@ class Season(Serie):
 
     seasonId = 1
 
-    def __init__(self, title, overview, homepage, nbSeason, genre, seasonTitle, seasonOverview, nbEpisode):
+    def __init__(self, title, overview, homepage, nbSeason, genre, seasonTitle,
+                 seasonOverview, nbEpisode):
         Serie.__init__(self, title, overview, homepage, nbSeason, genre)
         self._seasonTitle = seasonTitle
         self._seasonOverview = seasonOverview
