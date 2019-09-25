@@ -2,11 +2,13 @@ from server import app
 import os
 import sys
 
-available_commands = 'runserver'
+available_commands = ('runserver',)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2 or sys.argv[1] != 'runserver':
-        print('\nWrong command, please use a rightful command following this typo :\tpython manage.py <COMMAND>\n\nList of available commands :\n' + available_commands)
+        print('\nWrong command, please use a rightful command following this',
+              ' typo:\tpython manage.py <COMMAND>\n\nList of available',
+              'commands :\n' + '\n'.join(available_commands))
     else:
         # Development mode - TO BE REMOVED
         app.env = 'development'
