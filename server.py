@@ -9,3 +9,7 @@ def home(name=None):
 @app.route('/index')
 def index(name=None):
     return render_template('index.html', name=name)
+
+@app.route('/movies')
+def movies():
+    return render_template('movies.html', context={})
