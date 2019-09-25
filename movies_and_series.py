@@ -1,6 +1,7 @@
 class Cinema:
     def __init__(self, name, **kwargs):
         self._name = name
+        self._overview = kwargs.get('overview', '')
         self._makers = kwargs.get('makers', [])
         self._producers = kwargs.get('producers', [])
         self._actors = kwargs.get('actors', [])
