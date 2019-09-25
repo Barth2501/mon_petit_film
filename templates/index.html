@@ -1,7 +1,6 @@
-<!doctype html>
-<link rel = "stylesheet" href = "//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<link href='static/vendor/fontawesome-free/css/all.min.css' rel="stylesheet" type="text/css">
-<link href='static/css/sb-admin.min.css' rel="stylesheet" type="text/css">
+{% extends 'bootstrap_theme_samples/index.html'%}
+
+{% block content %}
 <div id='middle_buttons' class=' d-flex flex-row'>
   <div id='movies_btn' class='p-3'>
     <input class="btn btn-primary" type="button" value="Movies">
@@ -13,7 +12,7 @@
     <input class="btn btn-primary" type="button" value="Series">
   </div>
 </div>
-
+{% endblock content %}
 <script>
 $(document).ready(function() {
   $('#movies_btn').click(function() {
