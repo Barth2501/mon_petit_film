@@ -1,4 +1,7 @@
-class Cinema:
+from dao import DAO
+
+
+class Cinema(DAO):
     def __init__(self, name, **kwargs):
         self._name = name
         self._overview = kwargs.get('overview', '')
