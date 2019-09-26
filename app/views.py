@@ -1,6 +1,5 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import render_template, redirect, url_for
 
-app = Flask(__name__)
 
 @app.route('/')
 def home(name=None):
