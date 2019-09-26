@@ -1,4 +1,4 @@
-from __init__ import app
+from app.views import app
 import os
 import sys
 from dotenv import load_dotenv
