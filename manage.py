@@ -6,6 +6,7 @@ from pymongo import MongoClient
 
 available_commands = ('runserver',)
 
+
 if __name__ == '__main__':
     if len(sys.argv) != 2 or sys.argv[1] not in available_commands:
         print('\nWrong command, please use a rightful command following this',
