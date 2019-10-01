@@ -27,7 +27,7 @@ def index(name=None):
 def movies():
     return render_template('movies.html', context={})
 
-@app.route('/movie')
+@app.route('/movie', methods = ['POST'])
 def add_movie():
     movie = mongo.db.movies
     try :
@@ -38,3 +38,11 @@ def add_movie():
         return jsonify({'result' : output})
     except TypeError:
         return jsonify({'result' : 'niet'})
+
+@app.route('/movie', methods = ['GET'])
+def all_movie():
+    movie = mongo.db.movies
+    output = []
+    for s in movie.find():
+        output.append({'name' : s['name']})
+    return jsonify({'result' : output})
