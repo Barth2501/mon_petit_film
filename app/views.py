@@ -27,12 +27,15 @@ def index(name=None):
 def movies():
     return render_template('movies.html', context={})
 
-@app.route('/movie', methods = ['POST'])
+@app.route('/movie', methods = ['GET','POST'])
 def add_movie():
     movie = mongo.db.movies
     try :
+        print(1)
         name = request.json['name']
+        print(name)
         movie_id = movie.insert({'name':name})
+        print(3)
         new_movie = movie.find_one({'_id': movie_id })
         output = {'name' : new_movie['name']}
         return jsonify({'result' : output})

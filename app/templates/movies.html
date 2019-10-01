@@ -3,7 +3,27 @@
 
 {% block content %}
 <p>kikoo</p>
-{% endblock content %}
-<script>
+<div id='movies_btn' class='p-3'>
+    <input class="btn btn-primary" type="button" value="Series">
+</div>
 
+<script>
+$(document).ready(function() {
+  $('#movies_btn').click(function() {
+    $.ajax({
+            url: "{{ url_for('add_movie') }}",
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify({'name':'oui'}),
+        success: res => {
+            alert('stop')
+            window.location.href="{{ url_for('index') }}"
+        },
+        error: xhr => {
+            alert(xhr.responseText.split('\n')[1])
+        }
+    })
+    })
+})
 </script>
+{% endblock content %}
