@@ -14,7 +14,7 @@ $(document).ready(function() {
             url: "{{ url_for('add_movie') }}",
             type: 'POST',
             contentType: 'application/json;charset=UTF-8',
-            data: JSON.stringify({'name':'oui'}),
+            data: JSON.stringify({'name':'oui','description':'eheh'}),
         success: res => {
             alert('stop')
             window.location.href="{{ url_for('index') }}"
