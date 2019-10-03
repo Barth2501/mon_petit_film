@@ -1,12 +1,6 @@
 # import os
 from flask import render_template, redirect, url_for, Flask, request, jsonify
 from flask_pymongo import PyMongo
-<<<<<<< HEAD
-from flask import request
-from flask import jsonify
-import pandas as pd
-=======
->>>>>>> 56c10935edb87fc6ed8ee11c5f7c2d1346a905c5
 
 app = Flask(__name__)
 
@@ -30,7 +24,7 @@ def index(name=None):
 @app.route('/movies')
 def movies():
     genres = mongo.db.genres
-    #genres = pd.DataFrame(list(genres.find()))
+    # genres = pd.DataFrame(list(genres.find()))
     # for genre in genres.find():
     #     print(genre['name'])
     return render_template('movies.html', genres=genres)
