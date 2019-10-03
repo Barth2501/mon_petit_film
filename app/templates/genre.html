@@ -1,0 +1,33 @@
+<!doctype html>
+{% extends 'portfolio-1-col.html'%}
+
+{% block content %}
+
+{% for movie in movies.find({'genres.id':genre_id}) %}
+<!-- Project One -->
+<div class="row">
+    <div class="col-md-7">
+      <a href="#">
+        <img class="img-fluid rounded mb-3 mb-md-0" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}" alt="">
+      </a>
+    </div>
+    <div class="col-md-5">
+      <h3>{{movie['original_title']}}</h3>
+      <p>{{movie['overview']}}</p>
+      <a class="btn btn-primary" href="#">View Project
+        <span class="glyphicon glyphicon-chevron-right"></span>
+      </a>
+    </div>
+  </div>
+  <!-- /.row -->
+  
+<hr>
+{% endfor %}
+<p>kikoo</p>
+<script>
+$(document).ready(function() {
+    alert('oui')
+})
+</script>
+
+{% endblock content %}
