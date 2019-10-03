@@ -1,8 +1,23 @@
 <!doctype html>
-{% extends 'base_template.html'%}
+{% extends 'services.html'%}
 
 {% block content %}
-<p>kikoo</p>
+<div class="row">
+    {% for genre in genres.find() %}
+    <div class="col-lg-4 mb-4">
+      <div class="card h-100">
+        <h4 class="card-header">{{genre['name']}}</h4>
+        <div class="card-body">
+                <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{genre['example']}}" alt="First slide">
+          <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente esse necessitatibus neque.</p>
+        </div>
+        <div class="card-footer">
+          <a href="#" class="btn btn-primary">Learn More</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 <div id='movies_btn' class='p-3'>
     <input class="btn btn-primary" type="button" value="Series">
 </div>
