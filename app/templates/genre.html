@@ -1,8 +1,7 @@
 <!doctype html>
-{% extends 'portfolio-1-col.html'%}
+{% extends 'base_template.html'%}
 
 {% block content %}
-
 {% for movie in movies.find({'genres.id':genre_id}) %}
 <!-- Project One -->
 <div class="row">
@@ -23,11 +22,14 @@
   
 <hr>
 {% endfor %}
+
 <p>kikoo</p>
+{% endblock content %}
+
+{% block script %}
 <script>
 $(document).ready(function() {
     alert('oui')
 })
 </script>
-
-{% endblock content %}
+{% endblock script %}
