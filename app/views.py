@@ -9,6 +9,8 @@ app.config['MONGO_DBNAME'] = 'restdb'
 app.config['MONGO_URI'] = 'mongodb://heroku_1hj3v1h2:hiiq0l9nuj1fdffsqffr6spc1p@ds113799.mlab.com:13799/heroku_1hj3v1h2?retryWrites=false'
 
 mongo = PyMongo(app)
+genres_db = mongo.db.genres
+movies_db = mongo.db.movies
 
 
 @app.route('/')
@@ -23,8 +25,16 @@ def index(name=None):
 
 @app.route('/movies')
 def movies():
-    genres = mongo.db.genres
-    return render_template('movies.html', genres=genres)
+    genres_list = []
+    movies_by_genre = {}
+    for genre in genres_db.find():
+        genre.pop('_id')
+        genres_list.append(genre)
+        movies_by_genre[genre['name']] = []
+        for movie in movies_db.find({'genres.id': genre['id']}).limit(12):
+            movie.pop('_id')
+            movies_by_genre[genre['name']].append(movie)
+    return render_template('movies.html', genres_list=genres_list, movies_by_genre=movies_by_genre)
 
 
 @app.route('/movies/genre=<int:genre_id>')

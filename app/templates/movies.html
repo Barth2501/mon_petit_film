@@ -2,36 +2,54 @@
 {% extends 'base_template.html'%}
 
 {% block content %}
+{% for genre in genres_list %}
 <div class="row">
-  <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-    <ol class="carousel-indicators">
-      <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
-      <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
-      <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-    </ol>
-    <div class="carousel-inner" role="listbox">
-      {% for genre in genres.find() %}
-      <div class="carousel-item">
-        <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{genre['example']}}" alt="First slide" width="190" height="480">
-        <div class="carousel-caption d-none d-md-block">
-          <h3>{{ genre['name'] }}</h3>
-          <p>This is a description for the {{ genre['name'] }}.</p>
+  <div class="card w-100">
+    <h4 class="card-header bg-secondary">{{ genre['name'] }}</h4>
+    <div class="card-body">
+      <div id="carousel{{genre['name']}}" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+          <li data-target="#carousel{{genre['name']}}" data-slide-to="0" class="bg-secondary active"></li>
+          <li data-target="#carousel{{genre['name']}}" data-slide-to="1" class="bg-secondary"></li>
+          <li data-target="#carousel{{genre['name']}}" data-slide-to="2" class="bg-secondary"></li>
+        </ol>
+        <div class="carousel-inner" role="listbox">
+          {% for i in range(3) %}
+          <div class="carousel-item" style="height:inherit">
+            <div class="row">
+              {% for movie in movies_by_genre[genre['name']][i*4:(i+1)*4] %}
+              <div class="col-md-3">
+                <div class="card h-100">
+                  <h4 class="card-header">{{ movie['original_title'] }}</h4>
+                  <div class="card-body">
+                    <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}">
+                  </div>
+                  <div class="card-footer">
+                    <a href="{{ url_for('genre', genre_id=genre['id']) }}" class="btn btn-primary">Learn More</a>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
         </div>
+        <a class="carousel-control-prev" href="#carousel{{genre['name']}}" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carousel{{genre['name']}}" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
       </div>
-      {% endfor %}
     </div>
-    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="sr-only">Previous</span>
-    </a>
-    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="sr-only">Next</span>
-    </a>
   </div>
 </div>
+{% endfor %}
+
 <div class="row">
-  {% for genre in genres.find() %}
+  {% for genre in genres_list %}
   <div class="col-lg-4 mb-4">
     <div class="card h-50">
       <h4 class="card-header">{{genre['name']}}</h4>
@@ -53,7 +71,13 @@
 {% block script %}
 <script>
 $(document).ready(function() {
-  $('#carouselExampleIndicators').find('.carousel-item').first().addClass('active')
+  for (const genre of {{ genres_list|tojson }}) {
+    $('#carousel' + genre.name).find('.carousel-item').first().addClass('active')
+  }
+})
+</script>
+<script>
+$(document).ready(function() {
   $('#movies_btn').click(function() {
     $.ajax({
             url: "{{ url_for('add_movie') }}",
