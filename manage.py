@@ -2,7 +2,7 @@ from app.views import app
 import os
 import sys
 from dotenv import load_dotenv
-from pymongo import MongoClient
+from app.database import DB
 
 available_commands = ('runserver',)
 
@@ -15,8 +15,7 @@ if __name__ == '__main__':
     else:
         load_dotenv()
         # Launch db
-        #client = MongoClient(os.environ.get('MONGODB_URI'))
-        #db = client.get_default_database()
+        DB.init()
         # Launch app
         debug = os.environ.get('FLASK_ENV', 'production') == 'development'
         port = int(os.environ.get('PORT', 5000))

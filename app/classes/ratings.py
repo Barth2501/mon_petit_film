@@ -1,7 +1,26 @@
-class Ratings:
-    def __init__(self, rating, ratedObject, user):
+from app.database import DB
+from app.classes.movies_and_series import *
+
+class Ratings(object):
+    __tablename__ = 'ratings'
+
+    def __init__(self, rating, cinema, user):
         self._rating = rating
         self._user = user
-        user._addRating(self)
-        self._ratedObject = ratedObject
-        ratedObject._addRating(self)
+        self._cinema = cinema
+        user._addRating(cinema.name, rating)
+        cinema._addRating(user.username, rating)
+        if not DB.find_one('ratings', query={'user': user.username,'cinema': cinema.name}):
+            DB.insert(collection='ratings', data = {
+                'cinema': cinema.name,
+                'user': user.username,
+                'rating': rating
+            })
+
+    @property
+    def json(self):
+        return {
+            'user': self._user.json,
+            'cinema': self._cinema,
+            'rating': self._rating,
+        }

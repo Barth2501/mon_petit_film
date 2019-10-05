@@ -1,12 +1,13 @@
 import os
 from flask import render_template, redirect, url_for,Flask
 from flask_pymongo import PyMongo
-<<<<<<< HEAD
 from flask import request
 from flask import jsonify
 import pandas as pd
-=======
->>>>>>> d1e88ab098444bb22f992416e69d788233da1a80
+from flask_migrate import Migrate
+from app.classes.movies_and_series import *
+from app.classes.user import *
+from app.classes.ratings import *
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ app.config['MONGO_DBNAME'] = 'restdb'
 app.config['MONGO_URI'] = 'mongodb://heroku_1hj3v1h2:hiiq0l9nuj1fdffsqffr6spc1p@ds113799.mlab.com:13799/heroku_1hj3v1h2?retryWrites=false'
 
 mongo = PyMongo(app)
-
+migrate = Migrate(app, mongo)
 
 @app.route('/')
 def home(name=None):
@@ -24,18 +25,18 @@ def home(name=None):
 
 @app.route('/index')
 def index(name=None):
+    a=TVShow(name='barth_serie_test')
+    b=Season(name='test_season',number=1,tvShow=a)
+    d=Season(name='test_season_2',number=2,tvShow=a)
+    c=Episode(name='episode_test',number=1,runtime=100,season=b)
+    barth=User(username='barth2501',emailAddress='barth@',password='eheh')
+    r=Ratings(5,a,barth)
     return render_template('index.html', name=name)
 
 
 @app.route('/movies')
 def movies():
     genres = mongo.db.genres
-<<<<<<< HEAD
-=======
-    # genres = pd.DataFrame(list(genres.find()))
-    # for genre in genres.find():
-    #     print(genre['name'])
->>>>>>> d1e88ab098444bb22f992416e69d788233da1a80
     return render_template('movies.html', genres=genres)
 
 @app.route('/movies/genre=<int:genre_id>')
@@ -61,7 +62,6 @@ def all_movie():
     movie = mongo.db.movies
     output = []
     for s in movie.find():
-        print(s)
         try:
             output.append({
             'original_title':s['original_title']
