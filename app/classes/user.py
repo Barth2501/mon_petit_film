@@ -1,7 +1,8 @@
 from app.database import DB
+from flask_login import UserMixin
 
 
-class User(object):
+class User(UserMixin, object):
     __tablename__ = 'user'
 
     def __init__(self, username, emailAddress, password):
@@ -34,3 +35,7 @@ class User(object):
             query={'username': self._username},
             new_values={'$set': {'ratings': self._ratings}
         })
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))

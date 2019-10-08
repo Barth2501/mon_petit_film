@@ -13,7 +13,7 @@ class Cinema(object):
         self._producers = kwargs.get('producers', [])
         self._actors = kwargs.get('actors', [])
         self._genres = kwargs.get('genres', 'Unknown')
-        self._globalRating = kwargs.get('vote_average', 0)/2
+        self._globalRating = kwargs.get('globalRating', 0)/2 if isinstance(kwargs.get('globalRating', 0),int) else 0
         self._ratings = []
         
     def _addRating(self, user, rating):

@@ -4,10 +4,12 @@ from flask_pymongo import PyMongo
 from flask import request
 from flask import jsonify
 import pandas as pd
+import json
 from flask_migrate import Migrate
 from app.classes.movies_and_series import *
 from app.classes.user import *
 from app.classes.ratings import *
+from flask_login import LoginManager
 
 app = Flask(__name__)
 
@@ -19,6 +21,7 @@ mongo = PyMongo(app)
 genres_db = mongo.db.genres
 movies_db = mongo.db.movies
 
+login = LoginManager(app)
 
 @app.route('/')
 def home(name=None):
@@ -27,14 +30,12 @@ def home(name=None):
 
 @app.route('/index')
 def index(name=None):
-    a=TVShow(name='barth_serie_test')
-    b=Season(name='test_season',number=1,tvShow=a)
-    d=Season(name='test_season_2',number=2,tvShow=a)
-    c=Episode(name='episode_test',number=1,runtime=100,season=b)
-    barth=User(username='barth2501',emailAddress='barth@',password='eheh')
-    r=Ratings(5,a,barth)
+    # with open('movies.txt', 'r') as data_file:
+    #     json_data = data_file.read()
+    # datas = json.loads(json_data)
+    # for data in datas:
+    #     a=Movie(name=data['original_title'], overview=data['overview'], homepage=data['homepage'], id=data['id'], poster_path=data['poster_path'], release_date=data['release_date'], genres=data['genres'], globalRating=data['vote_average'], runtime=data['runtime'])
     return render_template('index.html', name=name)
-
 
 @app.route('/movies')
 def movies():
