@@ -9,7 +9,7 @@ from flask_migrate import Migrate
 from app.classes.movies_and_series import *
 from app.classes.user import *
 from app.classes.ratings import *
-from flask_login import LoginManager
+
 
 app = Flask(__name__)
 
@@ -20,8 +20,6 @@ app.config['MONGO_URI'] = 'mongodb://heroku_1hj3v1h2:hiiq0l9nuj1fdffsqffr6spc1p@
 mongo = PyMongo(app)
 genres_db = mongo.db.genres
 movies_db = mongo.db.movies
-
-login = LoginManager(app)
 
 @app.route('/')
 def home(name=None):
@@ -83,3 +81,16 @@ def all_movie():
         except KeyError:
             continue
     return jsonify({'result': output})
+
+from app.collab_filter import movie_rating_merged_data
+
+@app.route('/collab_filter')
+def colab_filter():
+    #for movie in movies_db.find():
+    #    id = movie['id']
+    #    try:
+    #        DB.update_one(collection='movies', query={'id': id}, new_values= {'$set': {'id':int(id)}})
+    #    except ValueError:
+    #        DB.delete_one(collection='movies',query={'id':id})
+    print(movie_rating_merged_data)
+    pass

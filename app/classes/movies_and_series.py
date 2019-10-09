@@ -2,6 +2,7 @@ from app.database import DB
 from app.classes.ratings import *
 
 class Cinema(object):
+    
     def __init__(self, name, **kwargs):
         self._name = name
         self._overview = kwargs.get('overview', '')

@@ -22,3 +22,6 @@ class DB(object):
     def update_one(collection, query,new_values):
         return DB.DATABASE[collection].update_one(query, new_values)
         
+    @staticmethod
+    def delete_one(collection,query):
+        return DB.DATABASE[collection].delete_one(query)
