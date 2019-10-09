@@ -1,6 +1,7 @@
 # import os
 from flask import render_template, redirect, url_for, Flask, request, jsonify
 from flask_pymongo import PyMongo
+<<<<<<< HEAD
 from flask import request
 from flask import jsonify
 import pandas as pd
@@ -10,6 +11,9 @@ from app.classes.movies_and_series import *
 from app.classes.user import *
 from app.classes.ratings import *
 
+=======
+from flask_login import LoginManager
+>>>>>>> afabdc0956788e7d81fbefdbcb6a9296b3c628e5
 
 app = Flask(__name__)
 
@@ -21,6 +25,12 @@ mongo = PyMongo(app)
 genres_db = mongo.db.genres
 movies_db = mongo.db.movies
 
+<<<<<<< HEAD
+=======
+login = LoginManager(app)
+
+
+>>>>>>> afabdc0956788e7d81fbefdbcb6a9296b3c628e5
 @app.route('/')
 def home(name=None):
     return redirect(url_for('index'))
@@ -28,12 +38,8 @@ def home(name=None):
 
 @app.route('/index')
 def index(name=None):
-    # with open('movies.txt', 'r') as data_file:
-    #     json_data = data_file.read()
-    # datas = json.loads(json_data)
-    # for data in datas:
-    #     a=Movie(name=data['original_title'], overview=data['overview'], homepage=data['homepage'], id=data['id'], poster_path=data['poster_path'], release_date=data['release_date'], genres=data['genres'], globalRating=data['vote_average'], runtime=data['runtime'])
     return render_template('index.html', name=name)
+
 
 @app.route('/movies')
 def movies():
