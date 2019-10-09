@@ -21,10 +21,7 @@ class DB(object):
     @staticmethod
     def update_one(collection, query, new_values):
         return DB.DATABASE[collection].update_one(query, new_values)
-<<<<<<< HEAD
         
     @staticmethod
     def delete_one(collection,query):
         return DB.DATABASE[collection].delete_one(query)
-=======
->>>>>>> afabdc0956788e7d81fbefdbcb6a9296b3c628e5

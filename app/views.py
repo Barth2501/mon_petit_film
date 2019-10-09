@@ -1,9 +1,6 @@
 # import os
 from flask import render_template, redirect, url_for, Flask, request, jsonify
 from flask_pymongo import PyMongo
-<<<<<<< HEAD
-from flask import request
-from flask import jsonify
 import pandas as pd
 import json
 from flask_migrate import Migrate
@@ -11,9 +8,6 @@ from app.classes.movies_and_series import *
 from app.classes.user import *
 from app.classes.ratings import *
 
-=======
-from flask_login import LoginManager
->>>>>>> afabdc0956788e7d81fbefdbcb6a9296b3c628e5
 
 app = Flask(__name__)
 
@@ -25,12 +19,6 @@ mongo = PyMongo(app)
 genres_db = mongo.db.genres
 movies_db = mongo.db.movies
 
-<<<<<<< HEAD
-=======
-login = LoginManager(app)
-
-
->>>>>>> afabdc0956788e7d81fbefdbcb6a9296b3c628e5
 @app.route('/')
 def home(name=None):
     return redirect(url_for('index'))

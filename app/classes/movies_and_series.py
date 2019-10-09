@@ -6,11 +6,6 @@ from bson.objectid import ObjectId
 class Cinema(DAO):
     _collection = 'cinema'
 
-<<<<<<< HEAD
-class Cinema(object):
-    
-=======
->>>>>>> afabdc0956788e7d81fbefdbcb6a9296b3c628e5
     def __init__(self, name, **kwargs):
         self._name = name
         self._overview = kwargs.get('overview', '')
