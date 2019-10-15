@@ -47,25 +47,25 @@
 {% block content %}
 <h1 class="my-4">Welcome to <img src='static/logo/MBM_seul.png' width="250" height="50"></h1>
 
-<div id='middle_buttons' class=' d-flex flex-row'>
-  <div id='movies_btn' class='p-3'>
-    <input class="btn btn-primary" type="button" value="Movies">
+<div class=' d-flex flex-row'>
+  <div class="p-3">
+    <a class="btn btn-primary" href="{{ url_for('movies') }}">Movies</a>
   </div>
-  <div id='search_bar' class="input-group-prepend p-3">
-    <input type="text" class="form-control" placeholder="Search a movies or a TV show" style="width:300px">
+  <div class="input-group-prepend p-3">
+    <input type="text" class="form-control" placeholder="Search a movie or a TV show" style="width:300px">
   </div>
-  <div id='series_btn' class='p-3'>
-    <input class="btn btn-primary" type="button" value="Series">
+  <div class="p-3">
+    <a class="btn btn-primary" href="/tv-shows">TV Shows</a>
   </div>
 </div>
-{% endblock content %}
 
-{% block script %}
-<script>
-$(document).ready(function() {
-  $('#movies_btn').click(function() {
-    window.location.href="{{ url_for('movies') }}"
-  })
-})
-</script>
-{% endblock script %}
+<div class="d-flex flex-row">
+  {% if username %}
+  Logged in as {{ username }}
+  <a class="btn btn-primary" href="{{ url_for('logout') }}">Log out</a>
+  {% else %}
+  <a class="btn btn-primary" href="{{ url_for('login') }}">Log in</a>
+  <a class="btn btn-primary" href="{{ url_for('sign_up') }}">Sign up</a>
+  {% endif %}
+</div>
+{% endblock content %}
