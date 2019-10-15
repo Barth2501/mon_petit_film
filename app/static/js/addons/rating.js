@@ -1,120 +1,98 @@
-(function ($) {
-  $.fn.mdbRate = function () {
-    var $stars;
-    // Custom whitelist to allow for using HTML tags in popover content
-    var myDefaultWhiteList = $.fn.tooltip.Constructor.Default.whiteList
-    myDefaultWhiteList.textarea = [];
-    myDefaultWhiteList.button = [];
-    
-    var $container = $(this);
-    
-    $stars = $('.rate-popover');
-    var titles = ['Very bad', 'Poor', 'OK', 'Good', 'Excellent'];
+var slice = [].slice;
 
-    for (var i = 0; i < 5; i++) {
-      $container.append(`<i class="py-2 px-1 rate-popover" data-index="${i}" data-html="true" data-toggle="popover"
-      data-placement="top" title="${titles[i]}"></i>`);
-    }
+(function($, window) {
+  var Starrr;
+  window.Starrr = Starrr = (function() {
+    Starrr.prototype.defaults = {
+      rating: void 0,
+      max: 5,
+      readOnly: false,
+      emptyClass: 'fa fa-star-o p-2',
+      fullClass: 'fas fa-star p-2',
+      change: function(e, value) {}
+    };
 
-    if ($container.hasClass('rating-faces')) {
-      $stars.addClass('far fa-meh-blank');
-    } else if ($container.hasClass('empty-stars')) {
-      $stars.addClass('far fa-star');
-    } else {
-      $stars.addClass('fas fa-star');
-    }
-
-    $stars.on('mouseover', function () {
-      var index = $(this).attr('data-index');
-      markStarsAsActive(index);
-    });
-
-    function markStarsAsActive(index) {
-      unmarkActive();
-
-      for (var i = 0; i <= index; i++) {
-
-        if ($container.hasClass('rating-faces')) {
-          $($stars.get(i)).removeClass('fa-meh-blank');
-          $($stars.get(i)).addClass('live');
-
-          switch (index) {
-            case '0':
-              $($stars.get(i)).addClass('fa-angry');
-              break;
-            case '1':
-              $($stars.get(i)).addClass('fa-frown');
-              break;
-            case '2':
-              $($stars.get(i)).addClass('fa-meh');
-              break;
-            case '3':
-              $($stars.get(i)).addClass('fa-smile');
-              break;
-            case '4':
-              $($stars.get(i)).addClass('fa-laugh');
-              break;
-          }
-
-        } else if ($container.hasClass('empty-stars')) {
-          $($stars.get(i)).addClass('fas');
-          switch (index) {
-            case '0':
-              $($stars.get(i)).addClass('oneStar');
-              break;
-            case '1':
-              $($stars.get(i)).addClass('twoStars');
-              break;
-            case '2':
-              $($stars.get(i)).addClass('threeStars');
-              break;
-            case '3':
-              $($stars.get(i)).addClass('fourStars');
-              break;
-            case '4':
-              $($stars.get(i)).addClass('fiveStars');
-              break;
-          }
-        } else {
-          $($stars.get(i)).addClass('amber-text');
-
-        }
+    function Starrr($el, options) {
+      this.options = $.extend({}, this.defaults, options);
+      this.$el = $el;
+      this.createStars();
+      this.syncRating();
+      if (this.options.readOnly) {
+        return;
       }
+      this.$el.on('mouseover.starrr', 'a', (function(_this) {
+        return function(e) {
+          return _this.syncRating(_this.getStars().index(e.currentTarget) + 1);
+        };
+      })(this));
+      this.$el.on('mouseout.starrr', (function(_this) {
+        return function() {
+          return _this.syncRating();
+        };
+      })(this));
+      this.$el.on('click.starrr', 'a', (function(_this) {
+        return function(e) {
+          e.preventDefault();
+          return _this.setRating(_this.getStars().index(e.currentTarget) + 1);
+        };
+      })(this));
+      this.$el.on('starrr:change', this.options.change);
     }
 
-    function unmarkActive() {
-      $stars.parent().hasClass('rating-faces') ? $stars.addClass('fa-meh-blank') : $stars;
-      $container.hasClass('empty-stars') ? $stars.removeClass('fas') : $container;
-      $stars.removeClass('fa-angry fa-frown fa-meh fa-smile fa-laugh live oneStar twoStars threeStars fourStars fiveStars amber-text');
+    Starrr.prototype.getStars = function() {
+      return this.$el.find('a');
+    };
+
+    Starrr.prototype.createStars = function() {
+      var j, ref, results;
+      results = [];
+      for (j = 1, ref = this.options.max; 1 <= ref ? j <= ref : j >= ref; 1 <= ref ? j++ : j--) {
+        results.push(this.$el.append("<a href='#' />"));
+      }
+      return results;
+    };
+
+    Starrr.prototype.setRating = function(rating) {
+      if (this.options.rating === rating) {
+        rating = void 0;
+      }
+      this.options.rating = rating;
+      this.syncRating();
+      return this.$el.trigger('starrr:change', rating);
+    };
+
+    Starrr.prototype.getRating = function() {
+      return this.options.rating;
+    };
+
+    Starrr.prototype.syncRating = function(rating) {
+      var $stars, i, j, ref, results;
+      rating || (rating = this.options.rating);
+      $stars = this.getStars();
+      results = [];
+      for (i = j = 1, ref = this.options.max; 1 <= ref ? j <= ref : j >= ref; i = 1 <= ref ? ++j : --j) {
+        results.push($stars.eq(i - 1).removeClass(rating >= i ? this.options.emptyClass : this.options.fullClass).addClass(rating >= i ? this.options.fullClass : this.options.emptyClass));
+      }
+      return results;
+    };
+
+    return Starrr;
+
+  })();
+  return $.fn.extend({
+    starrr: function() {
+      var args, option;
+      option = arguments[0], args = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+      return this.each(function() {
+        var data;
+        data = $(this).data('starrr');
+        if (!data) {
+          $(this).data('starrr', (data = new Starrr($(this), option)));
+        }
+        if (typeof option === 'string') {
+          return data[option].apply(data, args);
+        }
+      });
     }
-
-    $stars.on('click', function () {
-      $stars.popover('hide');
-    });
-
-    // Submit, you can add some extra custom code here
-    // ex. to send the information to the server
-    $container.on('click', '#voteSubmitButton', function () {
-      $stars.popover('hide');
-    });
-
-    // Cancel, just close the popover
-    $container.on('click', '#closePopoverButton', function () {
-      $stars.popover('hide');
-    });
-
-    if ($container.hasClass('feedback')) {
-
-      $(function () {
-        $stars.popover({
-          // Append popover to #rateMe to allow handling form inside the popover
-          container: $container,
-          // Custom content for popover
-          content: `<div class="my-0 py-0"> <textarea type="text" style="font-size: 0.78rem" class="md-textarea form-control py-0" placeholder="Write us what can we improve" rows="3"></textarea> <button id="voteSubmitButton" type="submit" class="btn btn-sm btn-primary">Submit!</button> <button id="closePopoverButton" class="btn btn-flat btn-sm">Close</button>  </div>`
-        });
-      })
-    }
-
-    $stars.tooltip();
-  }
-})(jQuery);
+  });
+})(window.jQuery, window);

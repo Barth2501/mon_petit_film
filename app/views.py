@@ -2,7 +2,10 @@
 from flask import render_template, redirect, url_for, Flask, request, jsonify, session, flash
 from flask_pymongo import PyMongo
 from app.classes.user import User
-
+from app.classes.ratings import Ratings
+from app.classes.movies_and_series import Cinema
+import pandas as pd
+from app.svd import recommend_movies
 app = Flask(__name__)
 
 app.config['MONGO_DBNAME'] = 'restdb'
@@ -68,8 +71,10 @@ def signup():
             return redirect(url_for('index'))
 
 
+
 @app.route('/test')
 def test():
+    recommend_movies(6850,20)
     return render_template('first_ratings.html')
 
 

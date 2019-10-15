@@ -4,14 +4,28 @@
 <div class="container">
     <span id="rateMe3"></span>
 </div>
-
+<div class='starrr'></div>
+<style>
+ 
+ .starrr {
+  display: inline-block; }
+  .starrr a {
+    font-size: 16px;
+    padding: 0 1px;
+    height:20px;
+    width:20px;
+    cursor: pointer;
+    color: #FFD119;
+    text-decoration: none; }
+</style>
+{% endblock content %}
+{% block script %}
   <!-- rating.js file -->
-  <script src="/static/js/jquery/jquery.min.js"></script>
-  <script src="/static/js/addons/rating.js"></script>
+  <script src="../static/js/addons/rating.js"></script>
 <script>
+
   $(document).ready(function() {
-    $('#rateMe3').mdbRate();
+    $('.starrr').starrr()
   });
 </script>
-
-  {% endblock content %}
+{% endblock script %}

@@ -15,6 +15,15 @@ class DAO:
         return [cls(**instance) for instance in db[cls._collection].find()]
 
     @classmethod
+    def all_values_list(cls, **kwargs):
+        if not isinstance(cls._collection, str):
+            cls._collection = cls.__name__.lower()
+        filters = {}
+        for key in kwargs.keys():
+            filters[key.replace('__', '.')] = kwargs[key]
+        return db[cls._collection].find({}, filters)
+
+    @classmethod
     def filter(cls, **kwargs):
         if not isinstance(cls._collection, str):
             cls._collection = cls.__name__.lower()

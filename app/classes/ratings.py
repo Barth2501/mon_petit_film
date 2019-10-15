@@ -1,7 +1,8 @@
 from app.database import DB
 from app.classes.movies_and_series import *
+from app.classes.dao import DAO
 
-class Ratings(object):
+class Ratings(DAO):
     __tablename__ = 'ratings'
 
     def __init__(self, rating, cinema, user):

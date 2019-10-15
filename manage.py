@@ -4,6 +4,9 @@ import sys
 from dotenv import load_dotenv
 from app.database import DB
 
+from app.classes.movies_and_series import Cinema
+from app.classes.ratings import Ratings
+import pandas as pd
 available_commands = ('runserver',)
 
 
@@ -21,3 +24,4 @@ if __name__ == '__main__':
         port = int(os.environ.get('PORT', 5000))
         app.secret_key = os.urandom(12)
         app.run(host='localhost', port=port, debug=debug)
+        
