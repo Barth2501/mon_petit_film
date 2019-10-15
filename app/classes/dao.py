@@ -10,14 +10,10 @@ class DAO:
 
     @classmethod
     def all(cls):
-        if not isinstance(cls._collection, str):
-            cls._collection = cls.__name__.lower()
         return [cls(**instance) for instance in db[cls._collection].find()]
 
     @classmethod
     def all_values_list(cls, **kwargs):
-        if not isinstance(cls._collection, str):
-            cls._collection = cls.__name__.lower()
         filters = {}
         for key in kwargs.keys():
             filters[key.replace('__', '.')] = kwargs[key]
@@ -25,8 +21,6 @@ class DAO:
 
     @classmethod
     def filter(cls, **kwargs):
-        if not isinstance(cls._collection, str):
-            cls._collection = cls.__name__.lower()
         filters = {}
         for key in kwargs.keys():
             filters[key.replace('__', '.')] = kwargs[key]
@@ -34,8 +28,6 @@ class DAO:
 
     @classmethod
     def get(cls, **kwargs):
-        if not isinstance(cls._collection, str):
-            cls._collection = cls.__name__.lower()
         filters = {}
         for key in kwargs.keys():
             filters[key.replace('__', '.')] = kwargs[key]
@@ -43,26 +35,34 @@ class DAO:
         return cls(**found) if found else None
 
     @classmethod
-    def insert_or_update_one(cls, **kwargs):
-        return cls(**kwargs).save()
+    def replace_one(cls, query, json):
+        return db[cls._collection].update_one(query, json)
+
+    @classmethod
+    def insert_one(cls, json):
+        return db[cls._collection].insert_one(json)
+
+    @classmethod
+    def update_one(cls, query, operations):
+        return db[cls._collection].update_one(query, operations)
+
+    @classmethod
+    def delete_one(cls, query):
+        return db[cls._collection].delete_one(query)
 
     def save(self):
-        if not isinstance(type(self)._collection, str):
-            type(self)._collection = type(self).__name__.lower()
         if not self._mongo_id:
             instance_from_db = type(self).get(name=self._name)
             if instance_from_db:
                 self._mongo_id = instance_from_db._mongo_id
         if self._mongo_id:
-            return db[type(self)._collection].replace_one({'_id': self._mongo_id}, self.json)
+            return type(self).replace_one({'_id': self._mongo_id}, self.json)
         else:
-            return db[type(self)._collection].insert_one(self.json)
+            return type(self).insert_one(self.json)
 
     def delete(self):
-        if not isinstance(type(self)._collection, str):
-            type(self)._collection = type(self).__name__.lower()
         deleted_in_db = False
         if self._mongo_id:
-            db[type(self)._collection].delete_one({'_id': self._mongo_id})
+            type(self).delete_one({'_id': self._mongo_id})
             deleted_in_db = True
         return deleted_in_db
