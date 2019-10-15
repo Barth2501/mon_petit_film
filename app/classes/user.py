@@ -1,10 +1,12 @@
 from app.database import DB
+from app.classes.dao import DAO
 
 
-class User(object):
+class User(DAO):
     __tablename__ = 'user'
 
-    def __init__(self, username, emailAddress, password):
+    def __init__(self, username, emailAddress, password, **kwargs):
+        self._id = kwargs.get('_id','')
         self._username = username
         self._emailAddress = emailAddress
         self._password = password

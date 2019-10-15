@@ -1,5 +1,5 @@
 # import os
-from flask import render_template, redirect, url_for, Flask, request, jsonify
+from flask import render_template, redirect, url_for, Flask, request, jsonify,session,flash
 from flask_pymongo import PyMongo
 import pandas as pd
 import json
@@ -21,14 +21,48 @@ movies_db = mongo.db.movies
 
 @app.route('/')
 def home(name=None):
-    return redirect(url_for('index'))
+    if not session.get('logged_in'):
+        return render_template('login.html')
+    else:
+        return redirect(url_for('index'))
 
 
 @app.route('/index')
 def index(name=None):
     return render_template('index.html', name=name)
 
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+    if User.get(username=username, password=password):
+        session['logged_in'] = True
+    else:
+        flash('wrong password!')
+    return home()
 
+@app.route('/sign_up')
+def sign_up():
+    return render_template('sign_up.html')
+
+@app.route('/register', methods=['POST'])
+def register():
+    username = request.form['inputName']
+    password = request.form['inputPassword']
+    passwordBis = request.form['inputPasswordBis']
+    email = request.form['inputEmail']
+    if password != passwordBis:
+        flash('The two password don\'t match')
+        return render_template('sign_up.html')
+    elif User.get(username=username):
+        flash('This user already exists')
+        return render_template('sign_up.html')
+    else:
+        user = User(username=username, emailAddress=email, password=password)
+        return render_template('first_ratings.html')
+@app.route('/test')
+def test():
+    return render_template('first_ratings.html')
 @app.route('/movies')
 def movies():
     genres_list = []
@@ -76,15 +110,16 @@ def all_movie():
             continue
     return jsonify({'result': output})
 
-from app.collab_filter import movie_rating_merged_data
 
-@app.route('/collab_filter')
-def colab_filter():
-    #for movie in movies_db.find():
-    #    id = movie['id']
-    #    try:
-    #        DB.update_one(collection='movies', query={'id': id}, new_values= {'$set': {'id':int(id)}})
-    #    except ValueError:
-    #        DB.delete_one(collection='movies',query={'id':id})
-    print(movie_rating_merged_data)
-    pass
+# from app.collab_filter import movie_rating_merged_data
+
+# @app.route('/collab_filter')
+# def colab_filter():
+#     #for movie in movies_db.find():
+#     #    id = movie['id']
+#     #    try:
+#     #        DB.update_one(collection='movies', query={'id': id}, new_values= {'$set': {'id':int(id)}})
+#     #    except ValueError:
+#     #        DB.delete_one(collection='movies',query={'id':id})
+#     print(movie_rating_merged_data)
+#     pass
