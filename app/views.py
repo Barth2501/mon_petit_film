@@ -1,13 +1,7 @@
 # import os
-from flask import render_template, redirect, url_for, Flask, request, jsonify,session,flash
+from flask import render_template, redirect, url_for, Flask, request, jsonify, session, flash
 from flask_pymongo import PyMongo
-import pandas as pd
-import json
-from flask_migrate import Migrate
-from app.classes.movies_and_series import *
-from app.classes.user import *
-from app.classes.ratings import *
-
+from app.classes.user import User
 
 app = Flask(__name__)
 
@@ -19,50 +13,66 @@ mongo = PyMongo(app)
 genres_db = mongo.db.genres
 movies_db = mongo.db.movies
 
+
 @app.route('/')
-def home(name=None):
-    if not session.get('logged_in'):
-        return render_template('login.html')
-    else:
-        return redirect(url_for('index'))
+def home():
+    return redirect(url_for('index'))
 
 
 @app.route('/index')
-def index(name=None):
-    return render_template('index.html', name=name)
+def index():
+    username = None
+    if 'username' in session:
+        username = session['username']
+    return render_template('index.html', username=username)
 
-@app.route('/login', methods=['POST'])
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
+
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
-    if User.get(username=username, password=password):
-        session['logged_in'] = True
+    if request.method == 'GET':
+        return render_template('login.html')
     else:
-        flash('wrong password!')
-    return home()
+        username = request.form['username']
+        password = request.form['password']
+        if User.get(username=username, password=password):
+            session['username'] = username
+        else:
+            flash('wrong password!')
+        return home()
 
-@app.route('/sign_up')
-def sign_up():
-    return render_template('sign_up.html')
 
-@app.route('/register', methods=['POST'])
-def register():
-    username = request.form['inputName']
-    password = request.form['inputPassword']
-    passwordBis = request.form['inputPasswordBis']
-    email = request.form['inputEmail']
-    if password != passwordBis:
-        flash('The two password don\'t match')
-        return render_template('sign_up.html')
-    elif User.get(username=username):
-        flash('This user already exists')
-        return render_template('sign_up.html')
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'GET':
+        return render_template('signup.html')
     else:
-        user = User(username=username, emailAddress=email, password=password)
-        return render_template('first_ratings.html')
+        username = request.form['inputName']
+        password = request.form['inputPassword']
+        passwordBis = request.form['inputPasswordBis']
+        email = request.form['inputEmail']
+        if password != passwordBis:
+            flash('The two password don\'t match')
+            return redirect(url_for('signup'))
+        elif User.get(username=username):
+            flash('This user already exists')
+            return redirect(url_for('signup'))
+        else:
+            user = User(username=username, emailAddress=email, password=password)
+            session['username'] = username
+            return redirect(url_for('index'))
+
+
 @app.route('/test')
 def test():
     return render_template('first_ratings.html')
+
+
 @app.route('/movies')
 def movies():
     genres_list = []
