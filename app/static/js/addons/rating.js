@@ -5,8 +5,9 @@
     var myDefaultWhiteList = $.fn.tooltip.Constructor.Default.whiteList
     myDefaultWhiteList.textarea = [];
     myDefaultWhiteList.button = [];
-
+    
     var $container = $(this);
+    
     $stars = $('.rate-popover');
     var titles = ['Very bad', 'Poor', 'OK', 'Good', 'Excellent'];
 
