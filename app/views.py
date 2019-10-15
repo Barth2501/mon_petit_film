@@ -30,7 +30,6 @@ def index():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    session.pop('logged_in', None)
     return redirect(url_for('index'))
 
 
@@ -42,31 +41,31 @@ def login():
         username = request.form['username']
         password = request.form['password']
         if User.get(username=username, password=password):
-            session['logged_in'] = True
             session['username'] = username
         else:
             flash('wrong password!')
         return home()
 
-@app.route('/sign_up')
-def sign_up():
-    return render_template('sign_up.html')
 
-@app.route('/register', methods=['POST'])
-def register():
-    username = request.form['inputName']
-    password = request.form['inputPassword']
-    passwordBis = request.form['inputPasswordBis']
-    email = request.form['inputEmail']
-    if password != passwordBis:
-        flash('The two password don\'t match')
-        return render_template('sign_up.html')
-    elif User.get(username=username):
-        flash('This user already exists')
-        return render_template('sign_up.html')
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'GET':
+        return render_template('signup.html')
     else:
-        user = User(username=username, emailAddress=email, password=password)
-        return render_template('first_ratings.html')
+        username = request.form['inputName']
+        password = request.form['inputPassword']
+        passwordBis = request.form['inputPasswordBis']
+        email = request.form['inputEmail']
+        if password != passwordBis:
+            flash('The two password don\'t match')
+            return redirect(url_for('signup'))
+        elif User.get(username=username):
+            flash('This user already exists')
+            return redirect(url_for('signup'))
+        else:
+            user = User(username=username, emailAddress=email, password=password)
+            session['username'] = username
+            return redirect(url_for('index'))
 
 
 @app.route('/test')
