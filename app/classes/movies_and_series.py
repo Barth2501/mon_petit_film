@@ -1,16 +1,17 @@
-from app.database import DB
 from .dao import DAO
 from bson.objectid import ObjectId
+from statistics import mean
 
 
 class Cinema(DAO):
     _collection = 'cinema'
 
     def __init__(self, name, **kwargs):
+        self._id = kwargs.get('id', None)
+        self._mongo_id = ObjectId(kwargs.get('_id')) if kwargs.get('_id', None) else None
         self._name = name
         self._overview = kwargs.get('overview', '')
         self._homepage = kwargs.get('homepage', '')
-        self._id = kwargs.get('id', None)
         self._poster_path = kwargs.get('poster_path', '')
         self._release_date = kwargs.get('release_date', None)
         self._makers = kwargs.get('makers', [])
@@ -19,26 +20,47 @@ class Cinema(DAO):
         self._genres = kwargs.get('genres', [])
         self._globalRating = kwargs.get('globalRating') if isinstance(kwargs.get('globalRating', None), int) else 0
         self._ratings = kwargs.get('ratings', [])
-        self._mongo_id = ObjectId(kwargs.get('_id')) if kwargs.get('_id', None) else None
 
-    def _addRating(self, user, rating):
-        self._ratings.append({
-            'user': user,
-            'rating': rating
-        })
-        self._globalRating = sum(rating['rating'] for rating in self._ratings)
-        DB.update_one(collection='cinema',
-                      query={'name': self._name},
-                      new_values={
-                        '$set': {
-                            'globalRating': self._globalRating,
-                            'ratings': self._ratings
-                        }
-                      })
+    def _addRating(self, userId, rating):
+        if not self._mongo_id:
+            instance_from_db = type(self).get(name=self._name)
+            if instance_from_db:
+                self._mongo_id = instance_from_db._mongo_id
+                self._ratings = instance_from_db._ratings
+        newRating = {'user': userId, 'rating': rating}
+        self._ratings.append(newRating)
+        self._globalRating = mean(rating['rating'] for rating in self._ratings)
+        if self._mongo_id:
+            return type(self).update_one({'_id': self._mongo_id}, {'$push': {'ratings': newRating}, '$set': {'globalRating': self._globalRating}})
 
     @property
     def name(self):
         return self._name
+
+
+class Movie(Cinema):
+    def __init__(self, name, runtime, **kwargs):
+        super().__init__(self, name, **kwargs)
+        self._runtime = runtime
+
+    @property
+    def json(self):
+        return {
+            'type': 'movie',
+            'name': self._name,
+            'overview': self._overview,
+            'homepage': self._homepage,
+            'id': self._id,
+            'poster_path': self._poster_path,
+            'release_date': self._release_date,
+            'makers': self._makers,
+            'producers': self._producers,
+            'actors': self._actors,
+            'genres': self._genres,
+            'globalRating': self._globalRating,
+            'ratings': self._ratings,
+            'runtime': self._runtime,
+        }
 
 
 class TVShow(Cinema):
@@ -69,45 +91,26 @@ class TVShow(Cinema):
         }
 
     def _addSeason(self, season):
-        self._seasons.append(season)
-        DB.update_one(collection='cinema', query={
-            'name': self._name,
-        }, new_values={
-            '$set': {'seasons': self._seasons}
-        })
+        if not self._mongo_id:
+            instance_from_db = TVShow.get(name=self._name)
+            if instance_from_db:
+                self._mongo_id = instance_from_db._mongo_id
+                self._seasons = instance_from_db._seasons
+        newSeason = {'id': season._id, 'number': season._number, 'name': season._name}
+        self._seasons.append(newSeason)
+        if self._mongo_id:
+            return TVShow.update_one({'_id': self._mongo_id}, {'$push': {'seasons': newSeason}})
 
     def _addEpisode(self, episode):
-        self._episodes.append(episode)
-        DB.update_one(collection='cinema', query={
-            'name': self._name,
-        }, new_values={
-            '$set': {'episodes': self._episodes}
-        })
-
-
-class Movie(Cinema):
-    def __init__(self, name, runtime, **kwargs):
-        super().__init__(self, name, **kwargs)
-        self._runtime = runtime
-
-    @property
-    def json(self):
-        return {
-            'type': 'movie',
-            'name': self._name,
-            'overview': self._overview,
-            'homepage': self._homepage,
-            'id': self._id,
-            'poster_path': self._poster_path,
-            'release_date': self._release_date,
-            'makers': self._makers,
-            'producers': self._producers,
-            'actors': self._actors,
-            'genres': self._genres,
-            'globalRating': self._globalRating,
-            'ratings': self._ratings,
-            'runtime': self._runtime,
-        }
+        if not self._mongo_id:
+            instance_from_db = TVShow.get(name=self._name)
+            if instance_from_db:
+                self._mongo_id = instance_from_db._mongo_id
+                self._episodes = instance_from_db._episodes
+        newEpisode = {'id': episode._id, 'number': episode._number, 'name': episode._name}
+        self._episodes.append(newEpisode)
+        if self._mongo_id:
+            return TVShow.update_one({'_id': self._mongo_id}, {'$push': {'episodes': newEpisode}})
 
 
 class Season(Cinema):
@@ -139,10 +142,15 @@ class Season(Cinema):
         }
 
     def _addEpisode(self, episode):
-        self._episodes.append(episode)
-        DB.update_one(collection='cinema',
-                      query={'seasons.name': self._name},
-                      new_values={'$set': {'seasons.$.episodes': self._episodes}})
+        if not self._mongo_id:
+            instance_from_db = Season.get(name=self._name)
+            if instance_from_db:
+                self._mongo_id = instance_from_db._mongo_id
+                self._episodes = instance_from_db._episodes
+        newEpisode = {'id': episode._id, 'number': episode._number, 'name': episode._name}
+        self._episodes.append(newEpisode)
+        if self._mongo_id:
+            return Season.update_one({'_id': self._mongo_id}, {'$push': {'episodes': newEpisode}})
 
 
 class Episode(Cinema):
