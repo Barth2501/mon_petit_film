@@ -30,16 +30,18 @@ def index():
     return render_template('index.html', username=username)
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'GET':
-        return render_template('login.html')
+    username = request.form['username']
+    password = request.form['password']
+    if User.get(username=username, password=password):
+        session['username'] = username
     else:
         username = request.form['username']
         password = request.form['password']
@@ -52,7 +54,7 @@ def login():
         return home()
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup', methods=['POST'])
 def signup():
     if request.method == 'GET':
         return render_template('sign_up.html')
