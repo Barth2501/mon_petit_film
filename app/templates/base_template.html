@@ -25,13 +25,13 @@
 
 <body>
 
-  <!-- Navigation -->
+  <!-- Navbar -->
   <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
     <a href="index" style="width:inherit;height:7vh">
-      <img src='static/logo/little_man.png' style="max-width:100%;max-height:100%;">
+      <img src='../static/logo/little_man.png' style="max-width:100%;max-height:100%;">
     </a>
     <a class="mr-auto" href="index" style="width:inherit;height:7vh;padding-top:1.5vh">
-      <img src='static/logo/MBM_seul.png' style="max-width:100%;max-height:80%;">
+      <img src='../static/logo/MBM_seul.png' style="max-width:100%;max-height:80%;">
     </a>
     <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -49,41 +49,97 @@
         </li>
         {% if session['username'] %}
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="document.getElementById('logout_form').submit()">Logout</a>
+          <a class="nav-link" href="#" onclick="document.getElementById('logoutForm').submit()">Logout</a>
         </li>
-        <form id="logout_form" action="{{ url_for('logout') }}" method="POST" style="display:none;"></form>
         {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('login') }}">Log in</a>
+          <a class="nav-link" href="#loginModal" data-toggle="modal" data-target="#loginModal">Log in</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/{{ url_for('signup') }}">Sign Up</a>
+          <a class="nav-link" href="#signupModal" data-toggle="modal" data-target="#signupModal">Sign Up</a>
         </li>
         {% endif %}
-
-
       </ul>
     </div>
   </nav>
 
+  <!-- Page content header -->
   <header>
     {% block header %}{% endblock header %}
   </header>
 
-  <!-- Page Content -->
+  <!-- Page content -->
   <div class="container" style="padding-top:2vh;padding-bottom:2vh;max-width:90%;">
     {% block content %}{% endblock content %}
   </div>
-  <!-- /.container -->
+
+  <!-- Page hidden_objects -->
+  <div class="hidden_objects">
+    {% if session['username'] %}
+    <form id="logoutForm" action="{{ url_for('logout') }}" method="POST" style="display:none;"></form>
+    {% else %}
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Login</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="eraseFormValues('loginForm')">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="loginForm" action="{{ url_for('login') }}" method="POST">
+              <div class="form-group">
+                <label for="inputUsername">Username</label>
+                <input type="text" class="form-control" id="inputUsername" placeholder="Enter username here..." name="username">
+              </div>
+              <div class="form-group">
+                <label for="inputPassword">Password</label>
+                <input type="password" class="form-control" id="inputPassword" placeholder="Enter password here..." name="password">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="eraseFormValues('loginForm')">Close</button>
+            <button type="button" class="btn btn-primary" onclick="submitModalForm('loginForm')">Log in</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% block hidden_objects %}{% endblock hidden_objects %}
+  </div>
 
   <!-- Footer -->
   <footer class="py-5 bg-dark">
     <div class="container">
       <p class="m-0 text-center text-white">Copyright &copy; MyBigMovie</p>
     </div>
-    <!-- /.container -->
   </footer>
 
+<script>
+  function submitModalForm (formId) {
+    form = document.getElementById(formId)
+    if (form) {
+      for (element of form.elements) {
+        if (element.value === '') {
+          alert('Please fill all entries before submitting')
+          return false
+        }
+      }
+      form.submit()
+    }
+  }
+  function eraseFormValues (formId) {
+    form = document.getElementById(formId)
+    if (form) {
+      for (element of form.elements) {
+        if (element.value) element.value = ''
+      }
+    }
+  }
+</script>
 {% block script %}{% endblock script %}
 
 </body>

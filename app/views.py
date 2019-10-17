@@ -33,18 +33,15 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'GET':
-        return render_template('login.html')
+    username = request.form['username']
+    password = request.form['password']
+    if User.get(username=username, password=password):
+        session['username'] = username
     else:
-        username = request.form['username']
-        password = request.form['password']
-        if User.get(username=username, password=password):
-            session['username'] = username
-        else:
-            flash('wrong password!')
-        return home()
+        flash('wrong password!')
+    return home()
 
 
 @app.route('/signup', methods=['GET', 'POST'])
