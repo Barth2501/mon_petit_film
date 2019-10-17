@@ -44,6 +44,8 @@ class User(DAO):
     @property
     def mongo_id(self):
         return str(self._mongo_id)
+        
+    @property
     def json(self):
         return {
             'username': self._username,

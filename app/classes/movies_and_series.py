@@ -18,8 +18,9 @@ class Cinema(DAO):
         self._producers = kwargs.get('producers', [])
         self._actors = kwargs.get('actors', [])
         self._genres = kwargs.get('genres', [])
-        self._globalRating = kwargs.get('globalRating') if isinstance(kwargs.get('globalRating', None), int) else 0
+        self._vote_average = kwargs.get('vote_average') if isinstance(kwargs.get('vote_average', None), int) else 0
         self._ratings = kwargs.get('ratings', [])
+        self._vote_count = kwargs.get('vote_count',0)
 
     def _addRating(self, userId, rating):
         if not self._mongo_id:
@@ -57,7 +58,7 @@ class Movie(Cinema):
             'producers': self._producers,
             'actors': self._actors,
             'genres': self._genres,
-            'globalRating': self._globalRating,
+            'vote_average': self._vote_average,
             'ratings': self._ratings,
             'runtime': self._runtime,
         }

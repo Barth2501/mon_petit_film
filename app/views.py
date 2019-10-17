@@ -6,6 +6,8 @@ from app.classes.ratings import Ratings
 from app.classes.movies_and_series import Cinema, Movie
 import pandas as pd
 from app.svd import recommend_movies
+import random
+
 app = Flask(__name__)
 
 app.config['MONGO_DBNAME'] = 'restdb'
@@ -27,6 +29,7 @@ def index():
     username = None
     if 'username' in session:
         username = session['username']
+    print(session)
     return render_template('index.html', username=username)
 
 
@@ -59,10 +62,10 @@ def signup():
     if request.method == 'GET':
         return render_template('sign_up.html')
     else:
-        username = request.form['inputName']
-        password = request.form['inputPassword']
-        passwordBis = request.form['inputPasswordBis']
-        email = request.form['inputEmail']
+        username = request.form['username']
+        password = request.form['password']
+        passwordBis = request.form['passwordBis']
+        email = request.form['email']
         if password != passwordBis:
             flash('The two password don\'t match')
             return redirect(url_for('signup'))
@@ -73,24 +76,24 @@ def signup():
             user = User(username=username, emailAddress=email, password=password)
             user.save()
             session['username'] = username
+            user = User.get(username=username)
             session['id'] = user.mongo_id
+            print(user.mongo_id)
             return redirect(url_for('first_ratings', username=user.json['username']))
 
 
 
 @app.route('/first_ratings/username=<username>')
 def first_ratings(username):
+    movies = Movie.filter(vote_count={'$gt':2000})
     film_sample = []
     poster_sample = []
     id_sample = []
-    for i in range(10):
-        try:
-            film = Movie.get(id=i).json
-            film_sample.append(film)
-            poster_sample.append(film['poster_path'])
-            id_sample.append(film['id'])
-        except AttributeError:
-            continue
+    while len(film_sample)<10:
+        film = movies[random.randint(1,len(movies))].json
+        film_sample.append(film)
+        poster_sample.append(film['poster_path'])
+        id_sample.append(film['id'])
     return render_template('first_ratings.html', film_sample=film_sample, poster_sample=poster_sample, id_sample=id_sample, username=username)
 
 @app.route('/add_rating/username=<username>', methods=['GET', 'POST'])
