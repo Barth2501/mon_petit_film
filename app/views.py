@@ -2,9 +2,6 @@
 from flask import render_template, redirect, url_for, Flask, request, jsonify, session, flash
 from flask_pymongo import PyMongo
 from app.classes.user import User
-from app.classes.ratings import Ratings
-from app.classes.movies_and_series import Cinema
-import pandas as pd
 from app.svd import recommend_movies
 app = Flask(__name__)
 
@@ -30,7 +27,7 @@ def index():
     return render_template('index.html', username=username)
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
@@ -69,7 +66,6 @@ def signup():
             user = User(username=username, emailAddress=email, password=password)
             session['username'] = username
             return redirect(url_for('index'))
-
 
 
 @app.route('/test')
