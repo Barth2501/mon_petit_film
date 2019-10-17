@@ -7,8 +7,8 @@ var slice = [].slice;
       rating: void 0,
       max: 5,
       readOnly: false,
-      emptyClass: 'fa fa-star-o p-2',
-      fullClass: 'fas fa-star p-2',
+      emptyClass: 'fa fa-star-o',
+      fullClass: 'fa fa-star',
       change: function(e, value) {}
     };
 

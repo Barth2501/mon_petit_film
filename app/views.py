@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, Flask, request, jsonify, s
 from flask_pymongo import PyMongo
 from app.classes.user import User
 from app.classes.ratings import Ratings
-from app.classes.movies_and_series import Cinema
+from app.classes.movies_and_series import Cinema, Movie
 import pandas as pd
 from app.svd import recommend_movies
 app = Flask(__name__)
@@ -43,8 +43,10 @@ def login():
     else:
         username = request.form['username']
         password = request.form['password']
-        if User.get(username=username, password=password):
+        user = User.get(username=username, password=password)
+        if user:
             session['username'] = username
+            session['id'] = user.mongo_id
         else:
             flash('wrong password!')
         return home()
@@ -53,7 +55,7 @@ def login():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'GET':
-        return render_template('signup.html')
+        return render_template('sign_up.html')
     else:
         username = request.form['inputName']
         password = request.form['inputPassword']
@@ -67,29 +69,57 @@ def signup():
             return redirect(url_for('signup'))
         else:
             user = User(username=username, emailAddress=email, password=password)
+            user.save()
             session['username'] = username
-            return redirect(url_for('index'))
+            session['id'] = user.mongo_id
+            return redirect(url_for('first_ratings', username=user.json['username']))
 
 
 
-@app.route('/test')
-def test():
-    recommend_movies(6850,20)
-    return render_template('first_ratings.html')
+@app.route('/first_ratings/username=<username>')
+def first_ratings(username):
+    film_sample = []
+    poster_sample = []
+    id_sample = []
+    for i in range(10):
+        try:
+            film = Movie.get(id=i).json
+            film_sample.append(film)
+            poster_sample.append(film['poster_path'])
+            id_sample.append(film['id'])
+        except AttributeError:
+            continue
+    return render_template('first_ratings.html', film_sample=film_sample, poster_sample=poster_sample, id_sample=id_sample, username=username)
 
+@app.route('/add_rating/username=<username>', methods=['GET', 'POST'])
+def add_rating(username):
+    if request.method == 'POST':
+        movieId = request.json['movieId']
+        rating = request.json['rating']
+        cinema = Movie.get(id=movieId)
+        user = User.get(username=username)
+        rat = Ratings(rating, cinema, user)
+        rat.save()
+    return 'bravo'
 
 @app.route('/movies')
 def movies():
+    reco_movies = recommend_movies(session['id'], 100)[1]
+    dict_reco_movies = reco_movies.to_dict('records')
     genres_list = []
     movies_by_genre = {}
     for genre in genres_db.find():
         genre.pop('_id')
-        genres_list.append(genre)
+        count = 0
         movies_by_genre[genre['name']] = []
-        for movie in movies_db.find({'genres.id': genre['id']}).limit(12):
-            movie.pop('_id')
-            movies_by_genre[genre['name']].append(movie)
-    return render_template('movies.html', genres_list=genres_list, movies_by_genre=movies_by_genre)
+        for i,g in enumerate(reco_movies['genres'].iteritems()):
+            for j in range(min(2,len(g[1]))):
+                if g[1][j]['id']==genre['id']:
+                    movies_by_genre[genre['name']].append(reco_movies.iloc[i,:].to_dict())
+                    count += 1
+        genres_list.append((genre,count))
+    genres_list.sort(key=lambda tup: tup[1], reverse = True)
+    return render_template('movies.html', dict_reco_movies=dict_reco_movies, genres_list=genres_list, movies_by_genre=movies_by_genre)
 
 
 @app.route('/movies/genre=<int:genre_id>')

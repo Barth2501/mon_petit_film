@@ -40,8 +40,8 @@ class Cinema(DAO):
 
 class Movie(Cinema):
     def __init__(self, name, runtime, **kwargs):
-        super().__init__(self, name, **kwargs)
-        self._runtime = runtime
+        Cinema.__init__(self, name, **kwargs)
+        self._runtime = kwargs.get('runtime', '')
 
     @property
     def json(self):

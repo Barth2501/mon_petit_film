@@ -10,13 +10,13 @@ class Ratings(DAO):
         self._cinema = cinema
 
     def save(self):
-        instance_from_db = Ratings.get(cinema=self._cinema._id, user=self._user._id)
+        self._user._addRating(self._cinema._id, self._rating)
+        self._cinema._addRating(self._user._mongo_id, self._rating)
+        instance_from_db = Ratings.get(cinema=self._cinema._id, user=self._user._mongo_id)
         if instance_from_db:
             return Ratings.replace_one({'_id': instance_from_db._mongo_id}, self.json)
         else:
             return Ratings.insert_one(self.json)
-        self._user._addRating(self._cinema._id, self._rating)
-        self._cinema._addRating(self._user._id, self._rating)
 
     def delete(self):
         deleted_in_db = False
@@ -29,7 +29,7 @@ class Ratings(DAO):
     @property
     def json(self):
         return {
-            'user': self._user._id,
+            'user': self._user._mongo_id,
             'cinema': self._cinema._id,
             'rating': self._rating,
         }

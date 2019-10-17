@@ -6,7 +6,6 @@ class User(DAO):
     _collection = 'user'
 
     def __init__(self, username, emailAddress, password, **kwargs):
-        self._id = kwargs.get('id', None)
         self._mongo_id = ObjectId(kwargs.get('_id')) if kwargs.get('_id', None) else None
         self._username = username
         self._emailAddress = emailAddress
@@ -36,3 +35,7 @@ class User(DAO):
         self._ratings.append(newRating)
         if self._mongo_id:
             return User.update_one({'_id': self._mongo_id}, {'$push': {'ratings': newRating}})
+
+    @property
+    def mongo_id(self):
+        return str(self._mongo_id)

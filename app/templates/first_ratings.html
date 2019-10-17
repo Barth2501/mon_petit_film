@@ -1,12 +1,17 @@
 {% extends 'base_template.html' %}
 
 {% block content %}
-<div class="container">
-    <span id="rateMe3"></span>
+<h1>Please rate a few movies for us to know you</h1>
+<div id='movie_rate' class='d-flex flex-row'>
+  <div class='p-2' id='image'>
+    <img id='mon_image' class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}" alt="First slide" >
+  </div>
+  
+  <div class='p-2 align-self-center'>
+    <div id='star1' class='starrr p-2'></div>
+  </div>
 </div>
-<div class='starrr'></div>
 <style>
- 
  .starrr {
   display: inline-block; }
   .starrr a {
@@ -15,17 +20,39 @@
     height:20px;
     width:20px;
     cursor: pointer;
-    color: #FFD119;
+    color: gold;
     text-decoration: none; }
 </style>
 {% endblock content %}
 {% block script %}
   <!-- rating.js file -->
-  <script src="../static/js/addons/rating.js"></script>
+<script src="../static/js/addons/rating.js"></script>
 <script>
-
   $(document).ready(function() {
-    $('.starrr').starrr()
-  });
+    $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}")
+    var counter = 0
+    var poster_sample = {{poster_sample|safe}};
+    var id_sample = {{id_sample|safe}}
+    $('#star1').starrr({
+      change: function(e, value){
+        $.ajax({
+        url: "{{ url_for('add_rating', username=username) }}",
+        type: 'POST',
+        contentType: 'application/json;charset=UTF-8',
+        data: JSON.stringify({'movieId':id_sample[counter],'rating':value}),
+        success: res => {
+          if (counter == id_sample.length) {
+            window.location.href="{{ url_for('index') }}"
+          }
+        },
+        error: xhr => {
+            alert(xhr.responseText.split('\n')[1])
+        }
+        })
+        counter = counter +1;
+        $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/" + poster_sample[counter]);
+      }
+    })
+    });
 </script>
 {% endblock script %}
