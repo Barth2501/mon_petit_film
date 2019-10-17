@@ -44,25 +44,19 @@ def login():
     return home()
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/signup', methods=['POST'])
 def signup():
-    if request.method == 'GET':
-        return render_template('signup.html')
+    username = request.form['username']
+    email = request.form['email']
+    password = request.form['password']
+    if User.get(username=username):
+        flash('This user already exists')
+        return home()
     else:
-        username = request.form['inputName']
-        password = request.form['inputPassword']
-        passwordBis = request.form['inputPasswordBis']
-        email = request.form['inputEmail']
-        if password != passwordBis:
-            flash('The two password don\'t match')
-            return redirect(url_for('signup'))
-        elif User.get(username=username):
-            flash('This user already exists')
-            return redirect(url_for('signup'))
-        else:
-            user = User(username=username, emailAddress=email, password=password)
-            session['username'] = username
-            return redirect(url_for('index'))
+        user = User(username=username, emailAddress=email, password=password)
+        user.save()
+        session['username'] = username
+        return home()
 
 
 @app.route('/test')

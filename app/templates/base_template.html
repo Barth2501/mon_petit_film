@@ -90,18 +90,51 @@
           <div class="modal-body">
             <form id="loginForm" action="{{ url_for('login') }}" method="POST">
               <div class="form-group">
-                <label for="inputUsername">Username</label>
-                <input type="text" class="form-control" id="inputUsername" placeholder="Enter username here..." name="username">
+                <label for="loginInputUsername">Username</label>
+                <input type="text" class="form-control" id="loginInputUsername" placeholder="Enter username here..." name="username">
               </div>
               <div class="form-group">
-                <label for="inputPassword">Password</label>
-                <input type="password" class="form-control" id="inputPassword" placeholder="Enter password here..." name="password">
+                <label for="loginInputPassword">Password</label>
+                <input type="password" class="form-control" id="loginInputPassword" placeholder="Enter password here..." name="password">
               </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="eraseFormValues('loginForm')">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="eraseFormValues('loginForm')">Cancel</button>
             <button type="button" class="btn btn-primary" onclick="submitModalForm('loginForm')">Log in</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Login</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="eraseFormValues('signupForm')">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="signupForm" action="{{ url_for('signup') }}" method="POST">
+              <div class="form-group">
+                <label for="signupInputUsername">Username</label>
+                <input type="text" class="form-control" id="signupInputUsername" placeholder="Enter username here..." name="username">
+              </div>
+              <div class="form-group">
+                <label for="signupInputEmail">Email</label>
+                <input type="email" class="form-control" id="signupInputEmail" placeholder="Enter email address here..." name="email">
+              </div>
+              <div class="form-group">
+                <label for="signupInputPassword">Password</label>
+                <input type="password" class="form-control" id="signupInputPassword" placeholder="Enter password here..." name="password">
+                <input type="password" class="form-control" id="signupInputPasswordBis" placeholder="Repeat password here..." name="passwordBis">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="eraseFormValues('signupForm')">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="submitModalForm('signupForm')">Sign up</button>
           </div>
         </div>
       </div>
@@ -120,14 +153,20 @@
 
 <script>
   function submitModalForm (formId) {
-    form = document.getElementById(formId)
+    const form = document.getElementById(formId)
     if (form) {
+      const passwordElements = []
       for (element of form.elements) {
         if (element.value === '') {
-          alert('Please fill all entries before submitting')
+          alert('Please fill all entries before submitting.')
           return false
         }
+        if (element.type === 'password') passwordElements.push(element)
       }
+      if (passwordElements.length === 2 && passwordElements[0].value !== passwordElements[1].value) {
+        alert('Passwords are not the same !')
+        return false
+      } 
       form.submit()
     }
   }
