@@ -31,6 +31,10 @@ class Cinema(DAO):
         newRating = {'user': userId, 'rating': rating}
         self._ratings.append(newRating)
         self._globalRating = mean(rating['rating'] for rating in self._ratings)
+        alreadyExist = Cinema.get(id=self._id, ratings__user=userId)
+        if alreadyExist:
+            if self._mongo_id:
+                return Cinema.update_one({'_id':self._mongo_id, 'ratings.user':userId},{'$set': {'ratings.$.rating':rating, 'globalRating': self._globalRating}})
         if self._mongo_id:
             return type(self).update_one({'_id': self._mongo_id}, {'$push': {'ratings': newRating}, '$set': {'globalRating': self._globalRating}})
 
@@ -102,16 +106,16 @@ class TVShow(Cinema):
         if self._mongo_id:
             return TVShow.update_one({'_id': self._mongo_id}, {'$push': {'seasons': newSeason}})
 
-    def _addEpisode(self, episode):
-        if not self._mongo_id:
-            instance_from_db = TVShow.get(name=self._name)
-            if instance_from_db:
-                self._mongo_id = instance_from_db._mongo_id
-                self._episodes = instance_from_db._episodes
-        newEpisode = {'id': episode._id, 'number': episode._number, 'name': episode._name}
-        self._episodes.append(newEpisode)
-        if self._mongo_id:
-            return TVShow.update_one({'_id': self._mongo_id}, {'$push': {'episodes': newEpisode}})
+    # def _addEpisode(self, episode):
+    #     if not self._mongo_id:
+    #         instance_from_db = TVShow.get(name=self._name)
+    #         if instance_from_db:
+    #             self._mongo_id = instance_from_db._mongo_id
+    #             self._episodes = instance_from_db._episodes
+    #     newEpisode = {'id': episode._id, 'number': episode._number, 'name': episode._name}
+    #     self._episodes.append(newEpisode)
+    #     if self._mongo_id:
+    #         return TVShow.update_one({'_id': self._mongo_id}, {'$push': {'episodes': newEpisode}})
 
 
 class Season(Cinema):

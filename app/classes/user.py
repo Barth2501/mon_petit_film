@@ -37,9 +37,14 @@ class User(DAO):
                 self._mongo_id = instance_from_db._mongo_id
                 self._ratings = instance_from_db._ratings
         newRating = {'cinema': cinemaId, 'rating': rating}
-        self._ratings.append(newRating)
-        if self._mongo_id:
-            return User.update_one({'_id': self._mongo_id}, {'$push': {'ratings': newRating}})
+        alreadyExist = User.get(username=self._username, ratings__cinema=cinemaId)
+        if alreadyExist:
+            if self._mongo_id:
+                return User.update_one({'_id':self._mongo_id,'ratings.cinema':cinemaId},{'$set':{'ratings.$.rating':rating}})
+        else:
+            self._ratings.append(newRating)
+            if self._mongo_id:
+                return User.update_one({'_id': self._mongo_id}, {'$push': {'ratings': newRating}})
 
     @property
     def mongo_id(self):

@@ -20,11 +20,18 @@ class DAO:
         return db[cls._collection].find({}, filters)
 
     @classmethod
-    def filter(cls, **kwargs):
+    def filter(cls, limit=0, **kwargs):
         filters = {}
         for key in kwargs.keys():
             filters[key.replace('__', '.')] = kwargs[key]
-        return [cls(**instance) for instance in db[cls._collection].find(filters)]
+        return [cls(**instance) for instance in db[cls._collection].find(filters).limit(limit)]
+
+    @classmethod
+    def filter_json(cls, limit=0, **kwargs):
+        filters = {}
+        for key in kwargs.keys():
+            filters[key.replace('__', '.')] = kwargs[key]
+        return [cls(**instance).json for instance in db[cls._collection].find(filters).limit(limit)]
 
     @classmethod
     def get(cls, **kwargs):
@@ -32,6 +39,7 @@ class DAO:
         for key in kwargs.keys():
             filters[key.replace('__', '.')] = kwargs[key]
         found = db[cls._collection].find_one(filters)
+        print(found)
         return cls(**found) if found else None
 
     @classmethod

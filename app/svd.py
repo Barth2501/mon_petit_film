@@ -33,7 +33,8 @@ def recommend_movies(userID, num_recommendations):
     ratings_df = ratings_df.astype({'userId':'int32','movieId':'int32','rating':'float32'})
     
     baseRatings = baseRatings.astype({'userId':'int32','movieId':'int32','rating':'float32'})
-    baseRatings = pd.concat([baseRatings,ratings_df])
+    baseRatings = pd.concat([baseRatings,ratings_df], ignore_index=True)
+    print(baseRatings)
     if Rating is None:
         Rating = baseRatings.pivot(index='userId',columns='movieId',values='rating').fillna(0)
 

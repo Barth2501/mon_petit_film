@@ -29,7 +29,6 @@ def index():
     username = None
     if 'username' in session:
         username = session['username']
-    print(session)
     return render_template('index.html', username=username)
 
 
@@ -78,7 +77,6 @@ def signup():
             session['username'] = username
             user = User.get(username=username)
             session['id'] = user.mongo_id
-            print(user.mongo_id)
             return redirect(url_for('first_ratings', username=user.json['username']))
 
 
@@ -103,7 +101,7 @@ def add_rating(username):
         rating = request.json['rating']
         cinema = Movie.get(id=movieId)
         user = User.get(username=username)
-        rat = Ratings(rating, cinema, user)
+        rat = Ratings(rating=rating, cinema=cinema, user=user)
         rat.save()
     return 'bravo'
 
@@ -118,22 +116,36 @@ def movies():
         count = 0
         movies_by_genre[genre['name']] = []
         for i,g in enumerate(reco_movies['genres'].iteritems()):
+            #s'occuper de tous les genres existants pour un film
             for j in range(min(2,len(g[1]))):
                 if g[1][j]['id']==genre['id']:
                     movies_by_genre[genre['name']].append(reco_movies.iloc[i,:].to_dict())
                     count += 1
         genres_list.append((genre,count))
     genres_list.sort(key=lambda tup: tup[1], reverse = True)
+
+    # rajouter des films random si pas assez de ce type avec la prediction
+    for genre in movies_by_genre.keys():
+        if len(movies_by_genre[genre]) < 21:
+            movies = Movie.filter(genres__name=genre, limit=21-len(movies_by_genre[genre]))
+            for movie in movies:
+                movies_by_genre[genre].append(movie.json)
     return render_template('movies.html', dict_reco_movies=dict_reco_movies, genres_list=genres_list, movies_by_genre=movies_by_genre)
 
 
 @app.route('/movies/genre=<int:genre_id>')
 def genre(genre_id):
-    movies = mongo.db.movies
+    movies = Movie.filter_json(vote_count={'$gt':2000},genres__id=genre_id)
     return render_template('genre.html', movies=movies, genre_id=genre_id)
 
+@app.route('/movies/movie=<int:movie_id>')
+def movie(movie_id):
+    movie = Movie.get(id=movie_id).json
+    if 'username' in session:
+        username = session['username']
+    return render_template('movie.html', movie=movie, username=username)
 
-@app.route('/movie', methods=['POST'])
+@app.route('/add_movie', methods=['POST'])
 def add_movie():
     movie = mongo.db.movies
     try:
@@ -147,7 +159,7 @@ def add_movie():
         return jsonify({'result': 'niet'})
 
 
-@app.route('/movie', methods=['GET'])
+@app.route('/add_movie', methods=['GET'])
 def all_movie():
     movie = mongo.db.movies
     output = []

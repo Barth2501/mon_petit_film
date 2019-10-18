@@ -16,7 +16,7 @@
             {% for i in range(3) %}
             <div class="carousel-item" style="height:inherit">
               <div class="row">
-                {% for movie in dict_reco_movies[i*4:(i+1)*4] %}
+                {% for movie in dict_reco_movies[i*7:(i+1)*7] %}
                 <div class="col-md-3">
                   <div class="card h-100">
                     <h4 class="card-header">{{ movie['name'] }}</h4>
@@ -57,7 +57,7 @@
           {% for i in range(3) %}
           <div class="carousel-item" style="height:inherit">
             <div class="row">
-              {% for movie in movies_by_genre[genre[0]['name']][i*4:(i+1)*4] %}
+              {% for movie in movies_by_genre[genre[0]['name']][i*7:(i+1)*7] %}
               <div class="col-md-3">
                 <div class="card h-100">
                   <h4 class="card-header">{{ movie['name'] }}</h4>
