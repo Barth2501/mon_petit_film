@@ -30,10 +30,10 @@
 
   <!-- Navbar -->
   <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <a href="index" style="width:inherit;height:7vh">
+    <a href="{{ url_for('home') }}" style="width:inherit;height:7vh">
       <img src='../static/logo/little_man.png' style="max-width:100%;max-height:100%;">
     </a>
-    <a class="mr-auto" href="index" style="width:inherit;height:7vh;padding-top:1.5vh">
+    <a class="mr-auto" href="{{ url_for('home') }}" style="width:inherit;height:7vh;padding-top:1.5vh">
       <img src='../static/logo/MBM_seul.png' style="max-width:100%;max-height:80%;">
     </a>
     <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
