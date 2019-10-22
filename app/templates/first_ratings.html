@@ -1,22 +1,33 @@
 {% extends 'base_template.html' %}
 
 {% block content %}
-<h1>Please rate a few movies for us to know you</h1>
+<h1 class='pt-2'>Please rate a few movies and couch back</h1>
 <div id='movie_rate' class='d-flex flex-row'>
-  <div class='p-2' id='image'>
-    <img id='mon_image' class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}" alt="First slide" >
+  <div class='p-2 h-25' id='image'>
+    <img id='mon_image' class="d-block" src="https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}" alt="First slide" >
   </div>
-  
   <div class='p-2 align-self-center'>
+    <div id='title'>
+      <h3>{{film_sample[0]['name']}}</h3>
+    </div>
+    <div id='description' class='h-50'>
+      <p>{{film_sample[0]['overview']}}</p>
+    </div>
+      <a id='unseen' class="fas fa-eye-slash fa-2x"></a>
     <div id='star1' class='starrr p-2'></div>
+    
   </div>
 </div>
 <style>
+  .overflow: {
+    overflow:hidden
+    text-overflow: ellipsis;
+  }
  .starrr {
   display: inline-block; }
   .starrr a {
-    font-size: 16px;
-    padding: 0 1px;
+    font-size: 26px;
+    padding: 4px;
     height:20px;
     width:20px;
     cursor: pointer;
@@ -31,8 +42,13 @@
   $(document).ready(function() {
     $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}")
     var counter = 0
-    var poster_sample = {{poster_sample|safe}};
-    var id_sample = {{id_sample|safe}}
+    var film_sample = {{film_sample|tojson}};
+    $('#unseen').on('click',function() {
+      counter = counter + 1
+      $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/" + film_sample[counter]['poster_path']);
+          $('#title').replaceWith( "<div id='title'><h3>" + film_sample[counter]['name'] + '</h3></div>');
+          $('#description').replaceWith("<div id='description' class='h-50'><p>" + film_sample[counter]['overview'] + '</p></div>')
+    })
     $('#star1').starrr({
       change: function(e, value){
         if (value) {
@@ -40,9 +56,9 @@
           url: "{{ url_for('add_rating', username=username) }}",
           type: 'POST',
           contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify({'movieId':id_sample[counter],'rating':value}),
+          data: JSON.stringify({'movieId':film_sample[counter]['id'],'rating':value}),
           success: res => {
-            if (counter == id_sample.length) {
+            if (counter == film_sample.length) {
               window.location.href="{{ url_for('index') }}"
             }
           },
@@ -51,7 +67,9 @@
           }
           })
           counter = counter +1;
-          $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/" + poster_sample[counter]);
+          $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/" + film_sample[counter]['poster_path']);
+          $('#title').replaceWith( "<div id='title'><h3>" + film_sample[counter]['name'] + '</h3></div>');
+          $('#description').replaceWith("<div id='description' class='h-50'><p>" + film_sample[counter]['overview'] + '</p></div>')
         }
       }
     })

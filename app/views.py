@@ -68,8 +68,6 @@ def signup():
         session['id'] = user.mongo_id
         return redirect(url_for('first_ratings', username=user.json['username']))
 
-
-
 @app.route('/first_ratings/username=<username>')
 def first_ratings(username):
     movies = Movie.filter(vote_count={'$gt':2000})
@@ -78,6 +76,8 @@ def first_ratings(username):
     id_sample = []
     while len(film_sample)<10:
         film = movies[random.randint(1,len(movies))].json
+        print(film)
+        film.pop('ratings')
         film_sample.append(film)
         poster_sample.append(film['poster_path'])
         id_sample.append(film['id'])

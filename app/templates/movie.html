@@ -4,20 +4,21 @@
 {% block content %}
 
 <div class="row">
-    <div class="col-md-7">
-      <a href="#">
+    <div class="col-md-7 pt-5">
+      <a>
         <img class="img-fluid rounded mb-3 mb-md-0" href="{{movie['homepage']}}" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}" alt="">
       </a>
     </div>
-    <div class="col-md-5">
-      <h3>{{movie['original_title']}}</h3>
-      <p>{{movie['overview']}}</p>
-      <a class="btn btn-primary" href="#">View Project
-        <span class="glyphicon glyphicon-chevron-right"></span>
-      </a>
+    <div class="col-md-5 d-flex flex-column pt-5 align-self-center">
+      <div id='title'>
+          <h3>{{movie['name']}}</h3>
+      </div>
+      <div id='description'>
+        <p>{{movie['overview']}}</p>
+      </div>
       <div class='p-2 align-self-center'>
-            <div id='star1' class='starrr p-2'></div>
-          </div>
+        <div id='star1' class='starrr'></div>
+      </div>
     </div>
   </div>
 
@@ -27,8 +28,8 @@
  .starrr {
   display: inline-block; }
   .starrr a {
-    font-size: 16px;
-    padding: 0 1px;
+    font-size: 26px;
+    padding: 4px;
     height:20px;
     width:20px;
     cursor: pointer;
