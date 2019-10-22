@@ -12,8 +12,11 @@ var slice = [].slice;
       change: function(e, value) {}
     };
 
+    var that;
+
     function Starrr($el, options) {
       this.options = $.extend({}, this.defaults, options);
+      that = this;
       this.$el = $el;
       this.createStars();
       this.syncRating();
@@ -36,9 +39,9 @@ var slice = [].slice;
           return _this.setRating(_this.getStars().index(e.currentTarget) + 1);
         };
       })(this));
-      this.$el.on('starrr:change', this.options.change);
+      this.$el.on('starrr:change', function(e, value) { return that.options.change(e, value); that.syncRating(2);});
     }
-
+  
     Starrr.prototype.getStars = function() {
       return this.$el.find('a');
     };
@@ -47,7 +50,7 @@ var slice = [].slice;
       var j, ref, results;
       results = [];
       for (j = 1, ref = this.options.max; 1 <= ref ? j <= ref : j >= ref; 1 <= ref ? j++ : j--) {
-        results.push(this.$el.append("<a href='#' />"));
+        results.push(this.$el.append("<a href='#' class='p-3' />"));
       }
       return results;
     };
@@ -58,7 +61,9 @@ var slice = [].slice;
       }
       this.options.rating = rating;
       this.syncRating();
-      return this.$el.trigger('starrr:change', rating);
+      var a = this.$el.trigger('starrr:change', rating);
+      this.options.rating = 0;
+      return a;
     };
 
     Starrr.prototype.getRating = function() {

@@ -39,7 +39,6 @@ class DAO:
         for key in kwargs.keys():
             filters[key.replace('__', '.')] = kwargs[key]
         found = db[cls._collection].find_one(filters)
-        print(found)
         return cls(**found) if found else None
 
     @classmethod
