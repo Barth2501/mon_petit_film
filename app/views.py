@@ -35,6 +35,7 @@ def index():
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('username', None)
+    session.pop('id', None)
     return redirect(url_for('index'))
 
 
@@ -42,42 +43,30 @@ def logout():
 def login():
     username = request.form['username']
     password = request.form['password']
-    if User.get(username=username, password=password):
+    user = User.get(username=username, password=password)
+    if user:
         session['username'] = username
+        session['id'] = user.mongo_id
     else:
-        username = request.form['username']
-        password = request.form['password']
-        user = User.get(username=username, password=password)
-        if user:
-            session['username'] = username
-            session['id'] = user.mongo_id
-        else:
-            flash('wrong password!')
-        return home()
+        flash('wrong password!')
+    return home()
 
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    if request.method == 'GET':
-        return render_template('sign_up.html')
+    username = request.form['username']
+    password = request.form['password']
+    email = request.form['email']
+    if User.get(username=username):
+        flash('This user already exists')
+        return home()
     else:
-        username = request.form['username']
-        password = request.form['password']
-        passwordBis = request.form['passwordBis']
-        email = request.form['email']
-        if password != passwordBis:
-            flash('The two password don\'t match')
-            return redirect(url_for('signup'))
-        elif User.get(username=username):
-            flash('This user already exists')
-            return redirect(url_for('signup'))
-        else:
-            user = User(username=username, emailAddress=email, password=password)
-            user.save()
-            session['username'] = username
-            user = User.get(username=username)
-            session['id'] = user.mongo_id
-            return redirect(url_for('first_ratings', username=user.json['username']))
+        user = User(username=username, emailAddress=email, password=password)
+        user.save()
+        session['username'] = username
+        user = User.get(username=username)
+        session['id'] = user.mongo_id
+        return redirect(url_for('first_ratings', username=user.json['username']))
 
 
 
