@@ -60,7 +60,7 @@ class DAO:
 
     def save(self):
         if not self._mongo_id:
-            instance_from_db = type(self).get(username=self._username)
+            instance_from_db = type(self).get(name=self._name)
             if instance_from_db:
                 self._mongo_id = instance_from_db._mongo_id
         if self._mongo_id:
