@@ -102,6 +102,8 @@ def movies():
     movies_by_genre = {}
     for genre in genres_db.find():
         genre.pop('_id')
+        genre['verbose_name'] = genre['name']
+        genre['name'] = genre['name'].replace(' ', '')
         count = 0
         movies_by_genre[genre['name']] = []
         for i,g in enumerate(reco_movies['genres'].iteritems()):
@@ -111,14 +113,20 @@ def movies():
                     movies_by_genre[genre['name']].append(reco_movies.iloc[i,:].to_dict())
                     count += 1
         genres_list.append((genre,count))
+
+    # tej les genres moins importants
     genres_list.sort(key=lambda tup: tup[1], reverse = True)
+    genres_list, genres_list_pop = [g[0] for g in genres_list[:8]], [g[0] for g in genres_list[8:]]
+    for genre in genres_list_pop:
+        movies_by_genre.pop(genre['name'])
 
     # rajouter des films random si pas assez de ce type avec la prediction
-    for genre in movies_by_genre.keys():
-        if len(movies_by_genre[genre]) < 21:
-            movies = Movie.filter(genres__name=genre, limit=21-len(movies_by_genre[genre]))
+    for genre in genres_list:
+        if len(movies_by_genre[genre['name']]) < 21:
+            movies = Movie.filter(genres__name=genre['verbose_name'], limit=21-len(movies_by_genre[genre['name']]))
             for movie in movies:
-                movies_by_genre[genre].append(movie.json)
+                movies_by_genre[genre['name']].append(movie.json)
+
     return render_template('movies.html', dict_reco_movies=dict_reco_movies, genres_list=genres_list, movies_by_genre=movies_by_genre)
 
 
