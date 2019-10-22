@@ -21,7 +21,9 @@
                 <div class="card h-100" style="min-height:50vh;max-height:50vh;">
                   <h5 class="card-header" style="height:18%;overflow:hidden;text-overflow:ellipsis;">{{ movie['name'] }}</h5>
                   <div class="card-body">
-                    <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500{{movie['poster_path']}}">
+                    <a href="{{ url_for('movie', movie_id=movie['id']) }}">
+                      <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500{{movie['poster_path']}}">
+                    </a>
                   </div>
                 </div>
               </div>
@@ -62,7 +64,9 @@
                 <div class="card h-100" style="min-height:50vh;max-height:50vh;">
                   <h5 class="card-header" style="height:18%;overflow:hidden;text-overflow:ellipsis;">{{ movie['name'] }}</h5>
                   <div class="card-body">
-                    <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}">
+                    <a href="{{ url_for('movie', movie_id=movie['id']) }}">
+                      <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}">
+                    </a>
                   </div>
                 </div>
               </div>
