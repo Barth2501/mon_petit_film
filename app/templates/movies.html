@@ -16,7 +16,8 @@
           {% for i in range(3) %}
           <div class="carousel-item" style="height:inherit">
             <div class="row">
-              {% for movie in dict_reco_movies[i*6:(i+1)*6] %}
+              <div class="col-md-1"></div>
+              {% for movie in dict_reco_movies[i*5:(i+1)*5] %}
               <div class="col-md-2">
                 <div class="card h-100" style="min-height:50vh;max-height:50vh;">
                   <h5 class="card-header" style="height:18%;overflow:hidden;text-overflow:ellipsis;">{{ movie['name'] }}</h5>
@@ -28,6 +29,7 @@
                 </div>
               </div>
               {% endfor %}
+              <div class="col-md-1"></div>
             </div>
           </div>
           {% endfor %}
@@ -61,7 +63,8 @@
           {% for i in range(3) %}
           <div class="carousel-item" style="height:inherit">
             <div class="row">
-              {% for movie in movies_by_genre[genre['name']][i*6:(i+1)*6] %}
+              <div class="col-md-1"></div>
+              {% for movie in movies_by_genre[genre['name']][i*5:(i+1)*5] %}
               <div class="col-md-2">
                 <div class="card h-100" style="min-height:50vh;max-height:50vh;">
                   <h5 class="card-header" style="height:18%;overflow:hidden;text-overflow:ellipsis;">{{ movie['name'] }}</h5>
@@ -73,6 +76,7 @@
                 </div>
               </div>
               {% endfor %}
+              <div class="col-md-1"></div>
             </div>
           </div>
           {% endfor %}

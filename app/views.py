@@ -96,7 +96,7 @@ def add_rating(username):
 
 @app.route('/movies')
 def movies():
-    reco_movies = recommend_movies(session['id'], 100)[1]
+    reco_movies = recommend_movies(session['id'], 80)[1]
     dict_reco_movies = reco_movies.to_dict('records')
     genres_list = []
     movies_by_genre = {}
