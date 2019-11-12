@@ -122,8 +122,8 @@ def movies():
 
     # rajouter des films random si pas assez de ce type avec la prediction
     for genre in genres_list:
-        if len(movies_by_genre[genre['name']]) < 21:
-            movies = Movie.filter(genres__name=genre['verbose_name'], limit=18-len(movies_by_genre[genre['name']]))
+        if len(movies_by_genre[genre['name']]) < 15:
+            movies = Movie.filter(genres__name=genre['verbose_name'], limit=15-len(movies_by_genre[genre['name']]))
             for movie in movies:
                 movies_by_genre[genre['name']].append(movie.json)
 
