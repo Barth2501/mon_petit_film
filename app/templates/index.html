@@ -9,9 +9,9 @@
 </div>
 <div class="row" style="height:2vh"></div>
 
-{% if username %}
+{% if session['username'] %}
 <div class="row">
-  <p class="ml-auto mr-auto" style="text-align:center;font-family:garamond">Hi {{ username }}! You can search here for any movie or tv show.<br>You can also jump straight to one of these categories!</p>
+  <p class="ml-auto mr-auto" style="text-align:center;font-family:garamond">Hi {{ session['username'] }}! You can search here for any movie or tv show.<br>You can also jump straight to one of these categories!</p>
 </div>
 <div class="row justify-content-around">
   <a class="btn btn-lg btn-dark" href="{{ url_for('movies') }}">Movies</a>
