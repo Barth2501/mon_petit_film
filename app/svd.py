@@ -8,6 +8,7 @@ from app.classes.user import User
 import numpy as np
 from bson.objectid import ObjectId
 
+import time
 movies_df = None
 ratings_df = None
 Rating = None
@@ -17,7 +18,8 @@ def recommend_movies(userID, num_recommendations):
     global movies_df
     global ratings_df
     global Rating
-    
+
+
     movies = Cinema.all_values_list(id=1, name=1, genres=1, poster_path=1, _id=0)
     if movies_df is None:
         movies_df = pd.DataFrame(movies)
@@ -31,18 +33,19 @@ def recommend_movies(userID, num_recommendations):
     ratings_df['userId'] = baseRatings['userId'].max() + 1
     ratings_df = ratings_df.rename(columns = {'cinema':'movieId'})
     ratings_df = ratings_df.astype({'userId':'int32','movieId':'int32','rating':'float32'})
-    
+
     baseRatings = baseRatings.astype({'userId':'int32','movieId':'int32','rating':'float32'})
     baseRatings = pd.concat([baseRatings,ratings_df], ignore_index=True)
-
+    # baseRatings = baseRatings[:100000]
     if Rating is None:
         Rating = baseRatings.pivot(index='userId',columns='movieId',values='rating').fillna(0)
 
     R = Rating.as_matrix()
     user_ratings_mean = np.mean(R, axis = 1)
     Ratings_demeaned = R - user_ratings_mean.reshape(-1, 1)
+    start_time4 = time.time()
 
-    U, sigma, Vt = svds(Ratings_demeaned, k = 50)
+    U, sigma, Vt = svds(Ratings_demeaned, k = 30)
     # plot(sigma)
     # show()
     sigma = np.diag(sigma)
@@ -71,7 +74,8 @@ def recommend_movies(userID, num_recommendations):
          sort_values('Predictions', ascending = False).
                        iloc[:num_recommendations, :-1]
                       )
-
+    start_time5 = time.time()
+    print("--- %s seconds ---" % (start_time5 - start_time4))
     return user_full, recommendations
 
 #already_rated, predictions = recommend_movies(preds, 6850, movies_df, ratings_df, 20)

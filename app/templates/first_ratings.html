@@ -45,9 +45,14 @@
     var film_sample = {{film_sample|tojson}};
     $('#unseen').on('click',function() {
       counter = counter + 1
-      $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/" + film_sample[counter]['poster_path']);
-          $('#title').replaceWith( "<div id='title'><h3>" + film_sample[counter]['name'] + '</h3></div>');
-          $('#description').replaceWith("<div id='description' class='h-50'><p>" + film_sample[counter]['overview'] + '</p></div>')
+      if (counter == film_sample.length) {
+              window.location.href="{{ url_for('index') }}"
+      } else {
+        $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/" + film_sample[counter]['poster_path']);
+        $('#title').replaceWith( "<div id='title'><h3>" + film_sample[counter]['name'] + '</h3></div>');
+        $('#description').replaceWith("<div id='description' class='h-50'><p>" + film_sample[counter]['overview'] + '</p></div>')
+      }
+      
     })
     $('#star1').starrr({
       change: function(e, value){
