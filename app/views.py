@@ -26,10 +26,7 @@ def home():
 
 @app.route('/index')
 def index():
-    username = None
-    if 'username' in session:
-        username = session['username']
-    return render_template('index.html', username=username)
+    return render_template('index.html')
 
 
 @app.route('/logout', methods=['POST'])
@@ -63,45 +60,47 @@ def signup():
     else:
         user = User(username=username, emailAddress=email, password=password)
         user.save()
-        session['username'] = username
         user = User.get(username=username)
+        session['username'] = username
         session['id'] = user.mongo_id
-        return redirect(url_for('first_ratings', username=user.json['username']))
+        return redirect(url_for('first_ratings'))
 
-@app.route('/first_ratings/username=<username>')
-def first_ratings(username):
+@app.route('/first_ratings', methods=['GET'])
+def first_ratings():
     movies = Movie.filter(vote_count={'$gt':2000})
     film_sample = []
     poster_sample = []
     id_sample = []
-    while len(film_sample)<10:
-        film = movies[random.randint(1,len(movies))].json
-        print(film)
+    while len(film_sample) < 10:
+        film = movies[random.randint(1, len(movies))].json
         film.pop('ratings')
         film_sample.append(film)
         poster_sample.append(film['poster_path'])
         id_sample.append(film['id'])
-    return render_template('first_ratings.html', film_sample=film_sample, poster_sample=poster_sample, id_sample=id_sample, username=username)
+    return render_template('first_ratings.html', film_sample=film_sample, poster_sample=poster_sample, id_sample=id_sample)
 
-@app.route('/add_rating/username=<username>', methods=['GET', 'POST'])
-def add_rating(username):
-    if request.method == 'POST':
-        movieId = request.json['movieId']
-        rating = request.json['rating']
-        cinema = Movie.get(id=movieId)
-        user = User.get(username=username)
-        rat = Ratings(rating=rating, cinema=cinema, user=user)
-        rat.save()
-    return 'bravo'
+@app.route('/add_rating', methods=['POST'])
+def add_rating():
+    if 'username' not in session:
+        return 'Not logged in'
+    movieId = request.json['movieId']
+    rating = request.json['rating']
+    cinema = Movie.get(id=movieId)
+    user = User.get(username=session['username'])
+    rat = Ratings(rating=rating, cinema=cinema, user=user)
+    rat.save()
+    return True
 
 @app.route('/movies')
 def movies():
-    reco_movies = recommend_movies(session['id'], 100)[1]
+    reco_movies = recommend_movies(session['id'], 80)[1]
     dict_reco_movies = reco_movies.to_dict('records')
     genres_list = []
     movies_by_genre = {}
     for genre in genres_db.find():
         genre.pop('_id')
+        genre['verbose_name'] = genre['name']
+        genre['name'] = genre['name'].replace(' ', '')
         count = 0
         movies_by_genre[genre['name']] = []
         for i,g in enumerate(reco_movies['genres'].iteritems()):
@@ -111,14 +110,20 @@ def movies():
                     movies_by_genre[genre['name']].append(reco_movies.iloc[i,:].to_dict())
                     count += 1
         genres_list.append((genre,count))
+
+    # tej les genres moins importants
     genres_list.sort(key=lambda tup: tup[1], reverse = True)
+    genres_list, genres_list_pop = [g[0] for g in genres_list[:8]], [g[0] for g in genres_list[8:]]
+    for genre in genres_list_pop:
+        movies_by_genre.pop(genre['name'])
 
     # rajouter des films random si pas assez de ce type avec la prediction
-    for genre in movies_by_genre.keys():
-        if len(movies_by_genre[genre]) < 21:
-            movies = Movie.filter(genres__name=genre, limit=21-len(movies_by_genre[genre]))
+    for genre in genres_list:
+        if len(movies_by_genre[genre['name']]) < 15:
+            movies = Movie.filter(genres__name=genre['verbose_name'], limit=15-len(movies_by_genre[genre['name']]))
             for movie in movies:
-                movies_by_genre[genre].append(movie.json)
+                movies_by_genre[genre['name']].append(movie.json)
+
     return render_template('movies.html', dict_reco_movies=dict_reco_movies, genres_list=genres_list, movies_by_genre=movies_by_genre)
 
 
@@ -134,32 +139,32 @@ def movie(movie_id):
         username = session['username']
     return render_template('movie.html', movie=movie, username=username)
 
-@app.route('/add_movie', methods=['POST'])
-def add_movie():
-    movie = mongo.db.movies
-    try:
-        name = request.json['name']
-        description = request.json['description']
-        movie_id = movie.insert({'name': name, 'description': description})
-        new_movie = movie.find_one({'_id': movie_id})
-        output = {'name': new_movie['name']}
-        return jsonify({'result': output})
-    except TypeError:
-        return jsonify({'result': 'niet'})
+# @app.route('/add_movie', methods=['POST'])
+# def add_movie():
+#     movie = mongo.db.movies
+#     try:
+#         name = request.json['name']
+#         description = request.json['description']
+#         movie_id = movie.insert({'name': name, 'description': description})
+#         new_movie = movie.find_one({'_id': movie_id})
+#         output = {'name': new_movie['name']}
+#         return jsonify({'result': output})
+#     except TypeError:
+#         return jsonify({'result': 'niet'})
 
 
-@app.route('/add_movie', methods=['GET'])
-def all_movie():
-    movie = mongo.db.movies
-    output = []
-    for s in movie.find():
-        try:
-            output.append({
-                'original_title': s['original_title']
-            })
-        except KeyError:
-            continue
-    return jsonify({'result': output})
+# @app.route('/add_movie', methods=['GET'])
+# def all_movie():
+#     movie = mongo.db.movies
+#     output = []
+#     for s in movie.find():
+#         try:
+#             output.append({
+#                 'original_title': s['original_title']
+#             })
+#         except KeyError:
+#             continue
+#     return jsonify({'result': output})
 
 
 # from app.collab_filter import movie_rating_merged_data

@@ -15,7 +15,6 @@
     </div>
       <a id='unseen' class="fas fa-eye-slash fa-2x"></a>
     <div id='star1' class='starrr p-2'></div>
-    
   </div>
 </div>
 <style>
@@ -35,6 +34,7 @@
     text-decoration: none; }
 </style>
 {% endblock content %}
+
 {% block script %}
   <!-- rating.js file -->
 <script src="../static/js/addons/rating.js"></script>
@@ -58,7 +58,7 @@
       change: function(e, value){
         if (value) {
           $.ajax({
-          url: "{{ url_for('add_rating', username=username) }}",
+          url: "{{ url_for('add_rating') }}",
           type: 'POST',
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify({'movieId':film_sample[counter]['id'],'rating':value}),
