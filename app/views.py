@@ -180,3 +180,7 @@ def movie(movie_id):
 #     #        DB.delete_one(collection='movies',query={'id':id})
 #     print(movie_rating_merged_data)
 #     pass
+
+@app.route('/profile', methods=['GET'])
+def profile():
+    return render_template('profile.html')
