@@ -93,8 +93,10 @@ def add_rating():
     return 'done'
 
 
-@app.route('/movies')
+@app.route('/movies', methods=['GET'])
 def movies():
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
     reco_movies = recommend_movies(session['id'], 80)[1]
     dict_reco_movies = reco_movies.to_dict('records')
     genres_list = []
@@ -131,12 +133,16 @@ def movies():
 
 @app.route('/movies/genre=<int:genre_id>')
 def genre(genre_id):
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
     movies = Movie.filter_json(vote_count={'$gt':2000},genres__id=genre_id)
     return render_template('genre.html', movies=movies, genre_id=genre_id)
 
 
 @app.route('/movies/movie=<int:movie_id>')
 def movie(movie_id):
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
     movie = Movie.get(id=movie_id)
     user = User.get(username=session['username'])
     rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
@@ -188,4 +194,6 @@ def movie(movie_id):
 
 @app.route('/profile', methods=['GET'])
 def profile():
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
     return render_template('profile.html')
