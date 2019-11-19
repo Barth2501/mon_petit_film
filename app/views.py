@@ -89,7 +89,7 @@ def add_rating():
     user = User.get(username=session['username'])
     rat = Ratings(rating=rating, cinema=cinema, user=user)
     rat.save()
-    return True
+    return 'done'
 
 @app.route('/movies')
 def movies():
@@ -134,10 +134,11 @@ def genre(genre_id):
 
 @app.route('/movies/movie=<int:movie_id>')
 def movie(movie_id):
-    movie = Movie.get(id=movie_id).json
-    if 'username' in session:
-        username = session['username']
-    return render_template('movie.html', movie=movie, username=username)
+    movie = Movie.get(id=movie_id)
+    user = User.get(username=session['username'])
+    rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
+    my_rating = rating._rating if rating else 'Not rated yet'
+    return render_template('movie.html', movie=movie.json, my_rating=my_rating)
 
 # @app.route('/add_movie', methods=['POST'])
 # def add_movie():
