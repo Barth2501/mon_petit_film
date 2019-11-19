@@ -3,11 +3,7 @@ import os
 import sys
 from dotenv import load_dotenv
 
-from app.classes.movies_and_series import Cinema
-from app.classes.ratings import Ratings
-import pandas as pd
 available_commands = ('runserver',)
-
 
 if __name__ == '__main__':
     if len(sys.argv) != 2 or sys.argv[1] not in available_commands:
