@@ -1,10 +1,9 @@
 # import os
-from flask import render_template, redirect, url_for, Flask, request, jsonify, session, flash
+from flask import render_template, redirect, url_for, Flask, request, session, flash
 from flask_pymongo import PyMongo
 from app.classes.user import User
 from app.classes.ratings import Ratings
-from app.classes.movies_and_series import Cinema, Movie
-import pandas as pd
+from app.classes.movies_and_series import Movie
 from app.svd import recommend_movies
 import random
 
@@ -65,6 +64,7 @@ def signup():
         session['id'] = user.mongo_id
         return redirect(url_for('first_ratings'))
 
+
 @app.route('/first_ratings', methods=['GET'])
 def first_ratings():
     movies = Movie.filter(vote_count={'$gt':2000})
@@ -79,6 +79,7 @@ def first_ratings():
         id_sample.append(film['id'])
     return render_template('first_ratings.html', film_sample=film_sample, poster_sample=poster_sample, id_sample=id_sample)
 
+
 @app.route('/add_rating', methods=['POST'])
 def add_rating():
     if 'username' not in session:
@@ -90,6 +91,7 @@ def add_rating():
     rat = Ratings(rating=rating, cinema=cinema, user=user)
     rat.save()
     return 'done'
+
 
 @app.route('/movies')
 def movies():
@@ -132,6 +134,7 @@ def genre(genre_id):
     movies = Movie.filter_json(vote_count={'$gt':2000},genres__id=genre_id)
     return render_template('genre.html', movies=movies, genre_id=genre_id)
 
+
 @app.route('/movies/movie=<int:movie_id>')
 def movie(movie_id):
     movie = Movie.get(id=movie_id)
@@ -139,6 +142,7 @@ def movie(movie_id):
     rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
     my_rating = rating._rating if rating else 'Not rated yet'
     return render_template('movie.html', movie=movie.json, my_rating=my_rating)
+
 
 # @app.route('/add_movie', methods=['POST'])
 # def add_movie():
@@ -180,6 +184,7 @@ def movie(movie_id):
 #     #        DB.delete_one(collection='movies',query={'id':id})
 #     print(movie_rating_merged_data)
 #     pass
+
 
 @app.route('/profile', methods=['GET'])
 def profile():
