@@ -1,40 +1,45 @@
+
 <!doctype html>
 {% extends 'base_template.html'%}
 
 {% block content %}
 
 <div class="row">
-    <div class="col-md-7 pt-5">
-      <a>
-        <img class="img-fluid rounded mb-3 mb-md-0" href="{{movie['homepage']}}" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}" alt="">
-      </a>
+  <div class="col-md-7 pt-5">
+    <a>
+      <img class="img-fluid rounded mb-3 mb-md-0" href="{{movie['homepage']}}"
+        src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}" alt="">
+    </a>
+  </div>
+  <div class="col-md-5 d-flex flex-column pt-5 align-self-center">
+    <div id='title'>
+      <h3>{{movie['name']}}</h3>
     </div>
-    <div class="col-md-5 d-flex flex-column pt-5 align-self-center">
-      <div id='title'>
-          <h3>{{movie['name']}}</h3>
-      </div>
-      <div id='description'>
-        <p>{{movie['overview']}}</p>
-      </div>
-      <div class='p-2 align-self-center'>
-        <div id='star1' class='starrr'></div>
-      </div>
+    <div id='description'>
+      <p>{{movie['overview']}}</p>
+    </div>
+    <div class='p-2 align-self-center'>
+      <div id='star1' class='starrr'></div>
     </div>
   </div>
+</div>
 
-  
+
 <hr>
 <style>
- .starrr {
-  display: inline-block; }
+  .starrr {
+    display: inline-block;
+  }
+
   .starrr a {
     font-size: 26px;
     padding: 4px;
-    height:20px;
-    width:20px;
+    height: 20px;
+    width: 20px;
     cursor: pointer;
     color: gold;
-    text-decoration: none; }
+    text-decoration: none;
+  }
 </style>
 {% endblock content %}
 
@@ -42,27 +47,27 @@
 <script src="../static/js/addons/rating.js"></script>
 
 <script>
-$(document).ready(function() {
+  $(document).ready(function () {
     $('#star1').starrr({
-      change: function(e, value){
+      change: function (e, value) {
         if (value) {
-        $.alert({
+          $.alert({
             icon: 'fa fa-spinner fa-spin',
             title: 'Thanks!',
-            content: 'We registered you rating!'
-        });
+            content: 'We registered your rating!'
+          });
           $.ajax({
-          url: "{{ url_for('add_rating', username=username) }}",
-          type: 'POST',
-          contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify({'movieId':{{ movie['id'] }},'rating':value}),
-          success: res => {
-            
-          },
-          error: xhr => {
-              alert(xhr.responseText.split('\n')[1])
-          }
-          })
+            url: "{{ url_for('add_rating', username=username) }}",
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify({ 'movieId': {{ movie['id'] }}, 'rating': value}),
+      success: res => {
+
+      },
+        error: xhr => {
+          alert(xhr.responseText.split('\n')[1])
+        }
+  })
         }
       }
     })

@@ -14,7 +14,8 @@ ratings_df = None
 Rating = None
 
 def recommend_movies(userID, num_recommendations):
-
+    start_time3 = time.time()
+    
     global movies_df
     global ratings_df
     global Rating
@@ -24,26 +25,32 @@ def recommend_movies(userID, num_recommendations):
     if movies_df is None:
         movies_df = pd.DataFrame(movies)
         movies_df = movies_df.astype({'id':'int32'})
-        
-    baseRatings = pd.read_csv('./rating_update.csv', header=0)
+    start_time6 = time.time()
+    print("--- load movies df: %s seconds ---" % (start_time6 - start_time3))
 
+    baseRatings = pd.read_csv('./rating_update.csv', header=0)[:100000]
+    print(baseRatings)
     ratings = User.get(_id=ObjectId(userID)).json['ratings']
-    if ratings_df is None:
-        ratings_df = pd.DataFrame(ratings, columns=('cinema','rating'))
+    ratings_df = pd.DataFrame(ratings, columns=('cinema','rating'))
+    # if ratings_df is None:
+    #     ratings_df = pd.DataFrame(ratings, columns=('cinema','rating'))
     ratings_df['userId'] = baseRatings['userId'].max() + 1
     ratings_df = ratings_df.rename(columns = {'cinema':'movieId'})
     ratings_df = ratings_df.astype({'userId':'int32','movieId':'int32','rating':'float32'})
 
     baseRatings = baseRatings.astype({'userId':'int32','movieId':'int32','rating':'float32'})
-    baseRatings = pd.concat([baseRatings,ratings_df], ignore_index=True)
+    baseRatings = pd.concat([baseRatings,ratings_df], ignore_index=True, sort=False)
+    start_time7 = time.time()
+    print("--- load rating df: %s seconds ---" % (start_time7 - start_time6))
     # baseRatings = baseRatings[:100000]
     if Rating is None:
         Rating = baseRatings.pivot(index='userId',columns='movieId',values='rating').fillna(0)
 
-    R = Rating.as_matrix()
+    R = Rating.to_numpy()
     user_ratings_mean = np.mean(R, axis = 1)
     Ratings_demeaned = R - user_ratings_mean.reshape(-1, 1)
     start_time4 = time.time()
+    print("--- construct the pivot %s seconds ---" % (start_time4 - start_time7))
 
     U, sigma, Vt = svds(Ratings_demeaned, k = 30)
     # plot(sigma)
@@ -75,7 +82,7 @@ def recommend_movies(userID, num_recommendations):
                        iloc[:num_recommendations, :-1]
                       )
     start_time5 = time.time()
-    print("--- %s seconds ---" % (start_time5 - start_time4))
+    print("--- building the svd %s seconds ---" % (start_time5 - start_time4))
     return user_full, recommendations
 
 #already_rated, predictions = recommend_movies(preds, 6850, movies_df, ratings_df, 20)

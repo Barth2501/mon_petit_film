@@ -89,7 +89,7 @@ def add_rating():
     user = User.get(username=session['username'])
     rat = Ratings(rating=rating, cinema=cinema, user=user)
     rat.save()
-    return True
+    return 'true'
 
 @app.route('/movies')
 def movies():
