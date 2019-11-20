@@ -1,14 +1,36 @@
 # import os
-from flask import render_template, redirect, url_for, Flask, request, jsonify, session, flash
+from flask import render_template, redirect, url_for, Flask, request, session, flash
 from flask_pymongo import PyMongo
 from app.classes.user import User
 from app.classes.ratings import Ratings
-from app.classes.movies_and_series import Cinema, Movie
-import pandas as pd
+from app.classes.movies_and_series import Movie
 from app.svd import recommend_movies
 import random
+from celery.schedules import crontab
+from flask_mail import Mail
 
 app = Flask(__name__)
+app.config.update(
+    CELERY_BROKER_URL='redis://localhost:6379',
+    CELERY_RESULT_BACKEND='redis://localhost:6379',
+    CELERY_BEAT_SCHEDULE={
+        'task-number-one': {
+            'task': 'app.tasks.test',
+            'schedule': crontab(minute="*"),
+        },
+        'task-number-two': {
+            'task': 'app.tasks.test.print_hello',
+            'schedule': crontab(minute="*"),
+        }
+    },
+    CELERY_IMPORTS = ('app.tasks.test'),
+    CELERY_ACCEPT_CONTENT = ['application/json'],
+    CELERY_RESULT_SERIALIZER = 'json',
+    CELERY_TASK_SERIALIZER = 'json',
+    CELERY_TIMEZONE = 'UTC',
+)
+
+mail = Mail(app)
 
 app.config['MONGO_DBNAME'] = 'restdb'
 # app.config['MONGO_URI'] = os.environ.get('MONGODB_URI')
@@ -65,9 +87,10 @@ def signup():
         session['id'] = user.mongo_id
         return redirect(url_for('first_ratings'))
 
+
 @app.route('/first_ratings', methods=['GET'])
 def first_ratings():
-    movies = Movie.filter(vote_count={'$gt':2000})
+    movies = Movie.filter(vote_count={'$gt': 2000})
     film_sample = []
     poster_sample = []
     id_sample = []
@@ -79,6 +102,7 @@ def first_ratings():
         id_sample.append(film['id'])
     return render_template('first_ratings.html', film_sample=film_sample, poster_sample=poster_sample, id_sample=id_sample)
 
+
 @app.route('/add_rating', methods=['POST'])
 def add_rating():
     if 'username' not in session:
@@ -89,10 +113,13 @@ def add_rating():
     user = User.get(username=session['username'])
     rat = Ratings(rating=rating, cinema=cinema, user=user)
     rat.save()
-    return 'true'
+    return 'done'
 
-@app.route('/movies')
+
+@app.route('/movies', methods=['GET'])
 def movies():
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
     reco_movies = recommend_movies(session['id'], 80)[1]
     dict_reco_movies = reco_movies.to_dict('records')
     genres_list = []
@@ -103,24 +130,27 @@ def movies():
         genre['name'] = genre['name'].replace(' ', '')
         count = 0
         movies_by_genre[genre['name']] = []
-        for i,g in enumerate(reco_movies['genres'].iteritems()):
-            #s'occuper de tous les genres existants pour un film
-            for j in range(min(2,len(g[1]))):
-                if g[1][j]['id']==genre['id']:
-                    movies_by_genre[genre['name']].append(reco_movies.iloc[i,:].to_dict())
+        for i, g in enumerate(reco_movies['genres'].iteritems()):
+            # s'occuper de tous les genres existants pour un film
+            for j in range(min(2, len(g[1]))):
+                if g[1][j]['id'] == genre['id']:
+                    movies_by_genre[genre['name']].append(
+                        reco_movies.iloc[i, :].to_dict())
                     count += 1
-        genres_list.append((genre,count))
+        genres_list.append((genre, count))
 
     # tej les genres moins importants
-    genres_list.sort(key=lambda tup: tup[1], reverse = True)
-    genres_list, genres_list_pop = [g[0] for g in genres_list[:8]], [g[0] for g in genres_list[8:]]
+    genres_list.sort(key=lambda tup: tup[1], reverse=True)
+    genres_list, genres_list_pop = [g[0] for g in genres_list[:8]], [
+        g[0] for g in genres_list[8:]]
     for genre in genres_list_pop:
         movies_by_genre.pop(genre['name'])
 
     # rajouter des films random si pas assez de ce type avec la prediction
     for genre in genres_list:
         if len(movies_by_genre[genre['name']]) < 15:
-            movies = Movie.filter(genres__name=genre['verbose_name'], limit=15-len(movies_by_genre[genre['name']]))
+            movies = Movie.filter(
+                genres__name=genre['verbose_name'], limit=15-len(movies_by_genre[genre['name']]))
             for movie in movies:
                 movies_by_genre[genre['name']].append(movie.json)
 
@@ -129,15 +159,22 @@ def movies():
 
 @app.route('/movies/genre=<int:genre_id>')
 def genre(genre_id):
-    movies = Movie.filter_json(vote_count={'$gt':2000},genres__id=genre_id)
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
+    movies = Movie.filter_json(vote_count={'$gt': 2000}, genres__id=genre_id)
     return render_template('genre.html', movies=movies, genre_id=genre_id)
+
 
 @app.route('/movies/movie=<int:movie_id>')
 def movie(movie_id):
-    movie = Movie.get(id=movie_id).json
-    if 'username' in session:
-        username = session['username']
-    return render_template('movie.html', movie=movie, username=username)
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
+    movie = Movie.get(id=movie_id)
+    user = User.get(username=session['username'])
+    rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
+    my_rating = rating._rating if rating else 'Not rated yet'
+    return render_template('movie.html', movie=movie.json, my_rating=my_rating)
+
 
 # @app.route('/add_movie', methods=['POST'])
 # def add_movie():
@@ -179,3 +216,10 @@ def movie(movie_id):
 #     #        DB.delete_one(collection='movies',query={'id':id})
 #     print(movie_rating_merged_data)
 #     pass
+
+
+@app.route('/profile', methods=['GET'])
+def profile():
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
+    return render_template('profile.html')

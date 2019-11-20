@@ -1,0 +1,5 @@
+<h1>Hi {session['username']}</h1>
+<p>Our engineers have worked for you this week-end and this is the movies we would recommand you :</p>
+{ for movie in dict_reco_movies.itertuples() }
+<h5>{{movie['name']}}</h5>
+<p>{{ movie['description']}}</p>
