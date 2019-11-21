@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, Flask, request, session, f
 from flask_pymongo import PyMongo
 from app.classes.user import User
 from app.classes.ratings import Ratings
-from app.classes.movies_and_series import Movie
+from app.classes.movies_and_series import Cinema, Movie
 from app.svd import recommend_movies
 import random
 from celery.schedules import crontab
@@ -217,3 +217,15 @@ def profile():
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
     return render_template('profile.html')
+
+
+@app.route('/search_in_db', methods=['POST'])
+def search_in_db():
+    if 'username' not in session:
+        return 'Not logged in'
+    query = request.json['query']
+    found = Cinema.get(name=query)
+    if found:
+        return str(found._id)
+    else:
+        return 'not found'

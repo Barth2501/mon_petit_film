@@ -15,7 +15,11 @@
 </div>
 <div class="row justify-content-around">
   <a class="btn btn-lg btn-dark" href="{{ url_for('movies') }}">Movies</a>
-  <input style="max-width:35%;" class="form-control" placeholder="Search here...">
+  <form class="form-inline" style="max-width:35%;" onsubmit="searchInDB(this);return false">
+    <input style="max-width:80%;" class="form-control" placeholder="Search here..." name="search">
+    &nbsp;&nbsp;
+    <button class="btn btn-sm btn-dark btn-round" type="submit">Search !</button>
+  </form>
   <a class="btn btn-lg btn-dark" href="/tv-shows">TV Shows</a>
 </div>
 {% else %}
@@ -29,3 +33,41 @@
 </div>
 {% endif %}
 {% endblock content %}
+
+{% block script %}
+<script>
+function searchInDB (form) {
+  var query = form['search'].value
+  $.ajax({
+    url: `{{ url_for('search_in_db') }}`,
+    type: 'POST',
+    contentType: 'application/json;charset=UTF-8',
+    data: JSON.stringify({query: query}),
+    success: response => {
+      if (response === 'not found') {
+        $.alert({
+          icon: 'fa fa-times',
+          title: 'Oops..',
+          content: 'We did not manage to find this movie / tv show.\nYou can try to write it well or just look into the movies or tv shows pages !'
+        })
+      } else {
+        $.confirm({
+          icon: 'fa fa-check',
+          title: 'Found it!',
+          content: 'We found the movie / tv show you requested :)\nClick on OK to jump to its description.',
+          onAction: function (btnName) {
+            if (btnName === 'ok') {
+              var foundUrl = "{{ url_for('movie', movie_id='0') }}".slice(0, -1) + response
+              return location.replace(foundUrl)
+            }
+          }
+        })
+      }
+    },
+    error: xhr => {
+        alert(xhr.responseText.split('\n')[1])
+    }
+  })
+}
+</script>
+{% endblock script %}
