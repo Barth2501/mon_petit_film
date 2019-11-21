@@ -51,7 +51,7 @@
         change: function (e, value) {
           if (value) {
             $.ajax({
-              url: "{{ url_for('add_rating', username=session['username']) }}",
+              url: "{{ url_for('add_rating') }}",
               type: 'POST',
               contentType: 'application/json;charset=UTF-8',
               data: JSON.stringify({'movieId':{{ movie['id'] }},'rating':value}),
@@ -59,7 +59,7 @@
                   alert(xhr.responseText.split('\n')[1])
               }
             })
-            x = $.alert({
+            $.alert({
               icon: 'fa fa-check',
               title: 'Thanks!',
               content: 'We registered your rating!',
@@ -67,7 +67,6 @@
                 return location.reload()
               }
             })
-            console.log(x)
           }
         }
       })
