@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from  matplotlib.pyplot import plot, show
+# from  matplotlib.pyplot import plot, show
 from scipy.sparse.linalg import svds
 from app.classes.movies_and_series import Cinema
 from app.classes.ratings import Ratings
