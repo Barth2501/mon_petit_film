@@ -162,11 +162,12 @@ def genre(genre_id):
 def movie(movie_id):
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
-    movie = Movie.get(id=movie_id)
+    movie = Movie.get(id=movie_id).json
+    movie['globalRating'] = float("{0:.2f}".format(movie['globalRating'])) if movie['globalRating'] else 'Not rated yet'
     user = User.get(username=session['username'])
     rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
     my_rating = rating._rating if rating else 'Not rated yet'
-    return render_template('movie.html', movie=movie.json, my_rating=my_rating)
+    return render_template('movie.html', movie=movie, my_rating=my_rating)
 
 
 # @app.route('/add_movie', methods=['POST'])
