@@ -13,21 +13,7 @@ app = Flask(__name__)
 app.config.update(
     CELERY_BROKER_URL='redis://localhost:6379',
     result_backend='redis://localhost:6379',
-    # CELERY_BEAT_SCHEDULE={
-    #     'task-number-one': {
-    #         'task': 'app.tasks.test',
-    #         'schedule': crontab(minute="*"),
-    #     },
-    #     'task-number-two': {
-    #         'task': 'app.tasks.test.print_hello',
-    #         'schedule': crontab(minute="*"),
-    #     }
-    # },
     imports = ('app.tasks.test','app.tasks.send_mail'),
-    # CELERY_ACCEPT_CONTENT = ['application/json'],
-    # CELERY_RESULT_SERIALIZER = 'json',
-    # CELERY_TASK_SERIALIZER = 'json',
-    # CELERY_TIMEZONE = 'UTC',
     MAIL_SERVER = 'smtp.gmail.com',
     MAIL_PORT = 587,
     MAIL_USE_TLS = True,
