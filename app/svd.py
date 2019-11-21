@@ -10,16 +10,11 @@ from bson.objectid import ObjectId
 
 import time
 movies_df = None
-ratings_df = None
-Rating = None
 
 def recommend_movies(userID, num_recommendations):
     start_time3 = time.time()
     
     global movies_df
-    global ratings_df
-    global Rating
-
 
     movies = Cinema.all_values_list(id=1, name=1, genres=1, poster_path=1, _id=0)
     if movies_df is None:
@@ -29,7 +24,6 @@ def recommend_movies(userID, num_recommendations):
     print("--- load movies df: %s seconds ---" % (start_time6 - start_time3))
 
     baseRatings = pd.read_csv('./rating_update.csv', header=0)[:100000]
-    print(baseRatings)
     ratings = User.get(_id=ObjectId(userID)).json['ratings']
     ratings_df = pd.DataFrame(ratings, columns=('cinema','rating'))
     # if ratings_df is None:
@@ -42,10 +36,7 @@ def recommend_movies(userID, num_recommendations):
     baseRatings = pd.concat([baseRatings,ratings_df], ignore_index=True, sort=False)
     start_time7 = time.time()
     print("--- load rating df: %s seconds ---" % (start_time7 - start_time6))
-    # baseRatings = baseRatings[:100000]
-    if Rating is None:
-        Rating = baseRatings.pivot(index='userId',columns='movieId',values='rating').fillna(0)
-
+    Rating = baseRatings.pivot(index='userId',columns='movieId',values='rating').fillna(0)
     R = Rating.to_numpy()
     user_ratings_mean = np.mean(R, axis = 1)
     Ratings_demeaned = R - user_ratings_mean.reshape(-1, 1)

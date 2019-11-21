@@ -12,22 +12,29 @@ from flask_mail import Mail
 app = Flask(__name__)
 app.config.update(
     CELERY_BROKER_URL='redis://localhost:6379',
-    CELERY_RESULT_BACKEND='redis://localhost:6379',
-    CELERY_BEAT_SCHEDULE={
-        'task-number-one': {
-            'task': 'app.tasks.test',
-            'schedule': crontab(minute="*"),
-        },
-        'task-number-two': {
-            'task': 'app.tasks.test.print_hello',
-            'schedule': crontab(minute="*"),
-        }
-    },
-    CELERY_IMPORTS = ('app.tasks.test'),
-    CELERY_ACCEPT_CONTENT = ['application/json'],
-    CELERY_RESULT_SERIALIZER = 'json',
-    CELERY_TASK_SERIALIZER = 'json',
-    CELERY_TIMEZONE = 'UTC',
+    result_backend='redis://localhost:6379',
+    # CELERY_BEAT_SCHEDULE={
+    #     'task-number-one': {
+    #         'task': 'app.tasks.test',
+    #         'schedule': crontab(minute="*"),
+    #     },
+    #     'task-number-two': {
+    #         'task': 'app.tasks.test.print_hello',
+    #         'schedule': crontab(minute="*"),
+    #     }
+    # },
+    imports = ('app.tasks.test','app.tasks.send_mail'),
+    # CELERY_ACCEPT_CONTENT = ['application/json'],
+    # CELERY_RESULT_SERIALIZER = 'json',
+    # CELERY_TASK_SERIALIZER = 'json',
+    # CELERY_TIMEZONE = 'UTC',
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = 'barthelemy.lancelot@zenrooms.com',
+    MAIL_PASSWORD = 'lancelot2501',
+    MAIL_DEFAULT_SENDER = 'barthelemy.lancelot@zenrooms.com'
 )
 
 mail = Mail(app)
