@@ -1,6 +1,6 @@
 <h1>Hi {{user['username']}}</h1>
 <p>Our engineers have worked for you this week-end and this is the movies we would recommand you :</p>
 {% for movie in dict_reco_movies %}
-<h5>{{movie['name']}}</h5>
-<p>{{ movie['description']}}</p>
+<a href="http://localhost:5000/movies/movie+{{movie['id']}}"><h5>{{movie['name']}}</h5></a>
+<img class="d-block w-25" src="https://image.tmdb.org/t/p/w500{{movie['poster_path']}}">
 {% endfor %}

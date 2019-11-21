@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 class User(DAO):
     _collection = 'user'
 
-    def __init__(self, username, emailAddress, password, **usernkwargs):
+    def __init__(self, username, emailAddress, password, **kwargs):
         self._mongo_id = ObjectId(kwargs.get('_id')) if kwargs.get('_id', None) else None
         self._username = username
         self._emailAddress = emailAddress

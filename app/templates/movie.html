@@ -1,4 +1,3 @@
-
 <!doctype html>
 {% extends 'base_template.html'%}
 
@@ -6,7 +5,8 @@
 <div class="row">
   <div class="col-md-6">
     <a>
-      <img class="img-fluid rounded mb-3 mb-md-0" href="{{movie['homepage']}}" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}" alt="">
+      <img class="img-fluid rounded mb-3 mb-md-0" href="{{movie['homepage']}}"
+        src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}" alt="">
     </a>
   </div>
   <div class="col-md-6 align-self-center">
@@ -51,22 +51,22 @@
       change: function (e, value) {
         if (value) {
           $.alert({
-            icon: 'fa fa-spinner fa-spin',
+            icon: 'fa',
             title: 'Thanks!',
-            content: 'We registered your rating!'
+            content: 'We registered your rating!',
           });
           $.ajax({
-          url: "{{ url_for('add_rating', username=session['username']) }}",
-          type: 'POST',
-          contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify({'movieId':{{ movie['id'] }},'rating':value}),
-          success: res => {
-            
-          },
-          error: xhr => {
-              alert(xhr.responseText.split('\n')[1])
-          }
-          })
+            url: "{{ url_for('add_rating', username=session['username']) }}",
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            data: JSON.stringify({ 'movieId': {{ movie['id'] }}, 'rating': value}),
+      success: res => {
+        window.location.reload()
+      },
+        error: xhr => {
+          alert(xhr.responseText.split('\n')[1])
+        }
+  })
         }
       }
     })
