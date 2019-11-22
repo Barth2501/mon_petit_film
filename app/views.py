@@ -6,33 +6,16 @@ from app.classes.ratings import Ratings
 from app.classes.movies_and_series import Movie
 from app.svd import recommend_movies
 import random
-from celery.schedules import crontab
 from flask_mail import Mail
+import app.config as config
+from celery import Celery
 
 app = Flask(__name__)
-app.config.update(
-    CELERY_BROKER_URL='redis://localhost:6379',
-    result_backend='redis://localhost:6379',
-    imports = ('app.tasks.test','app.tasks.send_mail'),
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = 587,
-    MAIL_USE_TLS = True,
-    MAIL_USE_SSL = False,
-    MAIL_USERNAME = 'barthelemy.lancelot@zenrooms.com',
-    MAIL_PASSWORD = 'lancelot2501',
-    MAIL_DEFAULT_SENDER = 'barthelemy.lancelot@zenrooms.com'
-)
+app.config.from_object(config)
 
 mail = Mail(app)
 
-app.config['MONGO_DBNAME'] = 'restdb'
-# app.config['MONGO_URI'] = os.environ.get('MONGODB_URI')
-app.config['MONGO_URI'] = 'mongodb://heroku_1hj3v1h2:hiiq0l9nuj1fdffsqffr6spc1p@ds113799.mlab.com:13799/heroku_1hj3v1h2?retryWrites=false'
-
 mongo = PyMongo(app)
-genres_db = mongo.db.genres
-movies_db = mongo.db.movies
-
 
 @app.route('/')
 def home():
