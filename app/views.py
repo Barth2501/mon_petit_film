@@ -148,6 +148,9 @@ def tvshows():
     tvshows_by_genre = {}
     for genre in genres_tvshow_db.find():
         genre.pop('_id')
+        genre['verbose_name'] = genre['name']
+        genre['name'] = genre['name'].replace(' ', '')
+        genre['name'] = genre['name'].replace('&', '')
         tvshows_by_genre[genre['name']] = []
         count = 0
         for tvshow in tvshows:
