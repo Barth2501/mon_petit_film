@@ -57,6 +57,10 @@ class DAO:
     def delete_one(cls, query):
         return db[cls._collection].delete_one(query)
 
+    @classmethod
+    def find_many(cls, query):
+        return db[cls._collection].find(query)
+
     def save(self):
         if not self._mongo_id:
             instance_from_db = type(self).get(name=self._name)
