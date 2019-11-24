@@ -20,10 +20,10 @@ class Cinema(DAO):
         self._actors = kwargs.get('actors', [])
         self._genres = kwargs.get('genres', [])
         self._vote_average = kwargs.get('vote_average') if isinstance(
-            kwargs.get('vote_average', None), int) else 0
+            kwargs.get('vote_average', None), int) else None
         self._ratings = kwargs.get('ratings', [])
         self._vote_count = kwargs.get('vote_count', 0)
-        self._globalRating = kwargs.get('globalRating', None)
+        self._globalRating = kwargs.get('globalRating', self._vote_average)
 
     def _addRating(self, userId, rating):
         if not self._mongo_id:
@@ -34,6 +34,9 @@ class Cinema(DAO):
         newRating = {'user': userId, 'rating': rating}
         self._ratings.append(newRating)
         self._globalRating = mean(rating['rating'] for rating in self._ratings)
+        if self._vote_average:
+            ratings_count = len(self._ratings)
+            self._globalRating = (ratings_count*self._globalRating+self._vote_count*self._vote_average)/(ratings_count+self._vote_count)
         alreadyExist = Cinema.get(id=self._id, ratings__user=userId)
         if alreadyExist:
             if self._mongo_id:
