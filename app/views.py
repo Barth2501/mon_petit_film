@@ -3,9 +3,10 @@ from flask import render_template, redirect, url_for, Flask, request, session, f
 from flask_pymongo import PyMongo
 from app.classes.user import User
 from app.classes.ratings import Ratings
-from app.classes.movies_and_series import Cinema, Movie
+from app.classes.movies_and_series import Cinema, Movie, TVShow
 from app.svd import recommend_movies
 import random
+from bson.objectid import ObjectId
 from flask_mail import Mail
 import app.config as config
 from celery import Celery
@@ -16,6 +17,11 @@ app.config.from_object(config)
 mail = Mail(app)
 
 mongo = PyMongo(app)
+
+genres_db = mongo.db.genres
+genres_tvshow_db = mongo.db.genres_tvshow
+movies_db = mongo.db.movies
+
 
 @app.route('/')
 def home():
@@ -133,6 +139,50 @@ def movies():
     return render_template('movies.html', dict_reco_movies=dict_reco_movies, genres_list=genres_list, movies_by_genre=movies_by_genre)
 
 
+@app.route('/tvshows')
+def tvshows():
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
+    tvshows = TVShow.filter_json(type={'$exists': True})
+    genres_list = []
+    tvshows_by_genre = {}
+    for genre in genres_tvshow_db.find():
+        genre.pop('_id')
+        tvshows_by_genre[genre['name']] = []
+        count = 0
+        for tvshow in tvshows:
+            for j in range(min(2, len(tvshow['genres']))):
+                if tvshow['genres'][j] == genre['id']:
+                    tvshows_by_genre[genre['name']].append(tvshow)
+                    count += 1
+        genres_list.append((genre, count))
+
+    genres_list.sort(key=lambda tup: tup[1], reverse=True)
+    genres_list, genres_list_pop = [g[0] for g in genres_list[:8]], [
+        g[0] for g in genres_list[8:]]
+    for genre in genres_list_pop:
+        tvshows_by_genre.pop(genre['name'])
+
+    return render_template('tvshows.html', genres_list=genres_list, tvshows_by_genre=tvshows_by_genre)
+
+
+@app.route('/tvshows/genre=<int:genre_id>')
+def genre_tvshows(genre_id):
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
+    tvshows = TVShow.filter_json(genres__id=genre_id, type={'$exists': True})
+    return render_template('genre_tvshows.html', tvshows=tvshows, genre_id=genre_id)
+
+
+@app.route('/tvshows/tvshow=<string:tvshow_id>')
+def tvshow(tvshow_id):
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
+    tvshow = TVShow.filter_json(_id=ObjectId(tvshow_id))[0]
+    print(tvshow['seasons'][0])
+    return render_template('tvshow.html', tvshow=tvshow)
+
+
 @app.route('/movies/genre=<int:genre_id>')
 def genre(genre_id):
     if 'username' not in session or 'id' not in session:
@@ -146,7 +196,8 @@ def movie(movie_id):
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
     movie = Movie.get(id=movie_id).json
-    movie['globalRating'] = float("{0:.2f}".format(movie['globalRating'])) if movie['globalRating'] else 'Not rated yet'
+    movie['globalRating'] = float("{0:.2f}".format(
+        movie['globalRating'])) if movie['globalRating'] else 'Not rated yet'
     user = User.get(username=session['username'])
     rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
     my_rating = rating._rating if rating else 'Not rated yet'

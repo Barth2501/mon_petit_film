@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+{% extends 'base_template.html'%} 
+{% block content %}
+<div class="row">
+  <div class="col-md-6">
+    <a>
+      <img
+        class="img-fluid rounded mb-3 mb-md-0"
+        src="https://image.tmdb.org/t/p/w500/{{tvshow['poster_path']}}"
+        alt=""
+      />
+    </a>
+  </div>
+  <div class="col-md-6 align-self-center">
+    <div class="row justify-content-center" style="text-align:center">
+      <h3>{{tvshow['name']}}</h3>
+      <p>{{tvshow['overview']}}</p>
+    </div>
+    <div class="row justify-content-center">
+      <h4>Global rating: {{tvshow['globalRating']}}</h4>
+    </div>
+    <div class="row justify-content-center">
+      <h4>My rating: {{my_rating}}</h4>
+    </div>
+    <div class="row justify-content-center">
+      <div id="star1" class="starrr"></div>
+    </div>
+  </div>
+</div>
+<div id='seasons'>
+{% for season in tvshow['seasons'] %}
+<div class="row" id='season'>
+    <div class="col-md-6">
+      <a>
+        <img
+          class="img-fluid rounded mb-3 mb-md-0"
+          src="https://image.tmdb.org/t/p/w500/{{season['poster_path']}}"
+          alt=""
+        />
+      </a>
+    </div>
+    <div class="col-md-6 align-self-center">
+      <div class="row justify-content-center" style="text-align:center">
+        <h3>{{season['name']}}</h3>
+        <p>{{season['overview']}}</p>
+      </div>
+    </div>
+  </div>
+  {% for episode in season['episodes'] %}
+  <div class="row">
+    <div class="col-md-6 align-self-center">
+      <div class="row justify-content-center" style="text-align:center">
+        <h3>{{episode['name']}}</h3>
+        <p>{{episode['overview']}}</p>
+      </div>
+      <div class="row justify-content-center">
+        <h4>Global rating: {{episode['globalRating']}}</h4>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+{% endfor %}
+</div>
+<style>
+  .starrr {
+    display: inline-block;
+  }
+
+  .starrr a {
+    font-size: 26px;
+    padding: 4px;
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+    color: gold;
+    text-decoration: none;
+  }
+</style>
+{% endblock content %} {% block script %}
+<script src="../static/js/addons/rating.js"></script>
+
+<script>
+    $(document).ready(function () {
+      $('#star1').starrr({
+        change: function (e, value) {
+          if (value) {
+            $.ajax({
+              url: "{{ url_for('add_rating') }}",
+              type: 'POST',
+              contentType: 'application/json;charset=UTF-8',
+              data: JSON.stringify({'tvshowId':{{ tvshow['mongo_id'] }},'rating':value}),
+              error: xhr => {
+                  alert(xhr.responseText.split('\n')[1])
+              }
+            })
+            $.alert({
+              icon: 'fa fa-check',
+              title: 'Thanks!',
+              content: 'We registered your rating!',
+              onClose: function () {
+                return location.reload()
+              }
+            })
+          }
+        }
+      })
+  })
+</script>
+{% endblock script %}

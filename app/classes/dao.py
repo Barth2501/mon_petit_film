@@ -14,10 +14,10 @@ class DAO:
 
     @classmethod
     def all_values_list(cls, **kwargs):
-        filters = {}
+        columns = {}
         for key in kwargs.keys():
-            filters[key.replace('__', '.')] = kwargs[key]
-        return db[cls._collection].find({}, filters)
+            columns[key.replace('__', '.')] = kwargs[key]
+        return db[cls._collection].find({'type': { '$exists': False }}, columns)
 
     @classmethod
     def filter(cls, limit=0, **kwargs):
@@ -63,7 +63,7 @@ class DAO:
             if instance_from_db:
                 self._mongo_id = instance_from_db._mongo_id
         if self._mongo_id:
-            return type(self).replace_one({'_id': self._mongo_id}, self.json)
+            return type(self).replace_one({'_id': self._mongo_id}, {'$set': self.json})
         else:
             return type(self).insert_one(self.json)
 

@@ -8,7 +8,8 @@ class Cinema(DAO):
 
     def __init__(self, name, **kwargs):
         self._id = kwargs.get('id', None)
-        self._mongo_id = ObjectId(kwargs.get('_id')) if kwargs.get('_id', None) else None
+        self._mongo_id = ObjectId(kwargs.get(
+            '_id')) if kwargs.get('_id', None) else None
         self._name = name
         self._overview = kwargs.get('overview', '')
         self._homepage = kwargs.get('homepage', '')
@@ -18,7 +19,8 @@ class Cinema(DAO):
         self._producers = kwargs.get('producers', [])
         self._actors = kwargs.get('actors', [])
         self._genres = kwargs.get('genres', [])
-        self._vote_average = kwargs.get('vote_average') if isinstance(kwargs.get('vote_average', None), int) else 0
+        self._vote_average = kwargs.get('vote_average') if isinstance(
+            kwargs.get('vote_average', None), int) else 0
         self._ratings = kwargs.get('ratings', [])
         self._vote_count = kwargs.get('vote_count', 0)
         self._globalRating = kwargs.get('globalRating', None)
@@ -35,13 +37,17 @@ class Cinema(DAO):
         alreadyExist = Cinema.get(id=self._id, ratings__user=userId)
         if alreadyExist:
             if self._mongo_id:
-                return Cinema.update_one({'_id':self._mongo_id, 'ratings.user':userId},{'$set': {'ratings.$.rating':rating, 'globalRating': self._globalRating}})
+                return Cinema.update_one({'_id': self._mongo_id, 'ratings.user': userId}, {'$set': {'ratings.$.rating': rating, 'globalRating': self._globalRating}})
         if self._mongo_id:
             return type(self).update_one({'_id': self._mongo_id}, {'$push': {'ratings': newRating}, '$set': {'globalRating': self._globalRating}})
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def mongo_id(self):
+        return str(self._mongo_id)
 
 
 class Movie(Cinema):
@@ -72,9 +78,9 @@ class Movie(Cinema):
 
 class TVShow(Cinema):
     def __init__(self, name, **kwargs):
-        super().__init__(self, name, **kwargs)
-        self._seasons = []
-        self._episodes = []
+        Cinema.__init__(self, name, **kwargs)
+        self._seasons = kwargs.get('seasons', [])
+        # self._episodes = []
         self._episodeLength = None
 
     @property
@@ -85,6 +91,7 @@ class TVShow(Cinema):
             'overview': self._overview,
             'homepage': self._homepage,
             'id': self._id,
+            'mongo_id': str(self._mongo_id),
             'poster_path': self._poster_path,
             'release_date': self._release_date,
             'makers': self._makers,
@@ -94,7 +101,7 @@ class TVShow(Cinema):
             'globalRating': self._globalRating,
             'ratings': self._ratings,
             'seasons': self._seasons,
-            'episodes': self._episodes,
+            # 'episodes': self._episodes,
         }
 
     def _addSeason(self, season):
@@ -103,10 +110,11 @@ class TVShow(Cinema):
             if instance_from_db:
                 self._mongo_id = instance_from_db._mongo_id
                 self._seasons = instance_from_db._seasons
-        newSeason = {'id': season._id, 'number': season._number, 'name': season._name}
-        self._seasons.append(newSeason)
+        # newSeason = {'number': season['number'], 'name': season['name'], 'overview':season['overview'], 'poster_path':season['poster_path'],'episodes':self.}
+        # self._seasons.append(newSeason)
+        self._seasons.append(season)
         if self._mongo_id:
-            return TVShow.update_one({'_id': self._mongo_id}, {'$push': {'seasons': newSeason}})
+            return TVShow.update_one({'_id': self._mongo_id}, {'$set': {'seasons': self._seasons}})
 
     # def _addEpisode(self, episode):
     #     if not self._mongo_id:
@@ -122,10 +130,10 @@ class TVShow(Cinema):
 
 class Season(Cinema):
     def __init__(self, name, number, tvShow, **kwargs):
-        super().__init__(self, name, **kwargs)
+        Cinema.__init__(self, name, **kwargs)
         self._tvShow = tvShow
         self._number = number
-        self._episodes = []
+        self._episodes = kwargs.get('episodes', [])
         tvShow._addSeason(self.json)
 
     @property
@@ -150,24 +158,25 @@ class Season(Cinema):
 
     def _addEpisode(self, episode):
         if not self._mongo_id:
-            instance_from_db = Season.get(name=self._name)
+            instance_from_db = TVShow.get(name=self._tvShow._name)
             if instance_from_db:
                 self._mongo_id = instance_from_db._mongo_id
-                self._episodes = instance_from_db._episodes
-        newEpisode = {'id': episode._id, 'number': episode._number, 'name': episode._name}
-        self._episodes.append(newEpisode)
+                self._episodes = instance_from_db.json['seasons'][self._number-1]['episodes']
+        # newEpisode = {'number': episode['number'], 'name': episode['name'],'overview':episode['overview'],'globalRating':episode['globalRating']}
+        # print(self._episodes)
+        self._episodes.append(episode)
         if self._mongo_id:
-            return Season.update_one({'_id': self._mongo_id}, {'$push': {'episodes': newEpisode}})
+            return TVShow.update_one({'_id': self._mongo_id, 'seasons.number': self._number}, {'$addToSet': {'seasons.$.episodes': episode}})
 
 
 class Episode(Cinema):
-    def __init__(self, name, number, runtime, season, **kwargs):
-        super().__init__(self, name, **kwargs)
+    def __init__(self, name, number, season, **kwargs):
+        Cinema.__init__(self, name, **kwargs)
         self._season = season
         self._tvShow = season._tvShow
         self._number = number
-        self._runtime = runtime
-        season._tvShow._addEpisode(self.json)
+        self._runtime = kwargs.get('runtime', '')
+        # season._tvShow._addEpisode(self.json)
         season._addEpisode(self.json)
 
     @property
