@@ -17,7 +17,7 @@ class DAO:
         columns = {}
         for key in kwargs.keys():
             columns[key.replace('__', '.')] = kwargs[key]
-        return db[cls._collection].find({'type': { '$exists': False }}, columns)
+        return db[cls._collection].find({}, columns)
 
     @classmethod
     def filter(cls, limit=0, **kwargs):
