@@ -91,7 +91,7 @@ def add_rating():
         return 'Not logged in'
     movieId = request.json['movieId']
     rating = request.json['rating']
-    cinema = Movie.get(id=movieId)
+    cinema = Cinema.get(id=movieId)
     user = User.get(username=session['username'])
     rat = Ratings(rating=rating, cinema=cinema, user=user)
     rat.save()
@@ -143,7 +143,7 @@ def movies():
 def tvshows():
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
-    tvshows = TVShow.filter_json(type={'$exists': True})
+    tvshows = TVShow.filter_json()
     genres_list = []
     tvshows_by_genre = {}
     for genre in genres_tvshow_db.find():
@@ -173,7 +173,7 @@ def tvshows():
 def genre_tvshows(genre_id):
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
-    tvshows = TVShow.filter_json(genres__id=genre_id, type={'$exists': True})
+    tvshows = TVShow.filter_json(genres__id=genre_id)
     return render_template('genre_tvshows.html', tvshows=tvshows, genre_id=genre_id)
 
 
@@ -261,8 +261,11 @@ def search_in_db():
     if 'username' not in session:
         return 'Not logged in'
     query = request.json['query']
-    found = Cinema.get(name=query)
-    if found:
-        return url_for('movie', movie_id=str(found._id))
+    movie_found = Movie.get(name=query)
+    if movie_found:
+        return url_for('movie', movie_id=str(movie_found._id))
+    tvshow_found = TVShow.get(name=query)
+    if tvshow_found:
+        return url_for('tvshow', tvshow_id=str(tvshow_found._id))
     else:
         return 'not found'

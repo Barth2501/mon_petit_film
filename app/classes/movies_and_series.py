@@ -41,10 +41,10 @@ class Cinema(DAO):
         vote_count = int(self._vote_count / 400) + 1
         self._globalRating = (ratings_count*self._globalRating+vote_count*vote_average)/(ratings_count+vote_count)
         # if already rated by this user, change old rating - else just add the new one
-        alreadyExist = Cinema.get(id=self._id, ratings__user=userId)
+        alreadyExist = type(self).get(id=self._id, ratings__user=userId)
         if alreadyExist:
             if self._mongo_id:
-                return Cinema.update_one({'_id': self._mongo_id, 'ratings.user': userId}, {'$set': {'ratings.$.rating': rating, 'globalRating': self._globalRating}})
+                return type(self).update_one({'_id': self._mongo_id, 'ratings.user': userId}, {'$set': {'ratings.$.rating': rating, 'globalRating': self._globalRating}})
         if self._mongo_id:
             return type(self).update_one({'_id': self._mongo_id}, {'$push': {'ratings': newRating}, '$set': {'globalRating': self._globalRating}})
 
@@ -58,6 +58,8 @@ class Cinema(DAO):
 
 
 class Movie(Cinema):
+    _collection = 'movies'
+
     def __init__(self, name, runtime, **kwargs):
         Cinema.__init__(self, name, **kwargs)
         self._runtime = kwargs.get('runtime', 0)
@@ -65,7 +67,6 @@ class Movie(Cinema):
     @property
     def json(self):
         return {
-            'type': 'movie',
             'name': self._name,
             'overview': self._overview,
             'homepage': self._homepage,
@@ -84,6 +85,8 @@ class Movie(Cinema):
 
 
 class TVShow(Cinema):
+    _collection = 'tvshows'
+
     def __init__(self, name, **kwargs):
         Cinema.__init__(self, name, **kwargs)
         self._seasons = kwargs.get('seasons', [])
@@ -92,7 +95,6 @@ class TVShow(Cinema):
     @property
     def json(self):
         return {
-            'type': 'tvshow',
             'name': self._name,
             'overview': self._overview,
             'homepage': self._homepage,
