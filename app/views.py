@@ -263,6 +263,6 @@ def search_in_db():
     query = request.json['query']
     found = Cinema.get(name=query)
     if found:
-        return str(found._id)
+        return url_for('movie', movie_id=str(found._id))
     else:
         return 'not found'

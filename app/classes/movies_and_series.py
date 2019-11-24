@@ -114,7 +114,7 @@ class TVShow(Cinema):
         # self._seasons.append(newSeason)
         self._seasons.append(season)
         if self._mongo_id:
-            return TVShow.update_one({'_id': self._mongo_id}, {'$set': {'seasons': self._seasons}})
+            return TVShow.update_one({'_id': self._mongo_id}, {'$addToSet': {'seasons': season}})
 
     # def _addEpisode(self, episode):
     #     if not self._mongo_id:
@@ -157,16 +157,16 @@ class Season(Cinema):
         }
 
     def _addEpisode(self, episode):
-        if not self._mongo_id:
+        if not self._tvShow._mongo_id:
             instance_from_db = TVShow.get(name=self._tvShow._name)
             if instance_from_db:
-                self._mongo_id = instance_from_db._mongo_id
+                self._tvShow._mongo_id = instance_from_db._mongo_id
                 self._episodes = instance_from_db.json['seasons'][self._number-1]['episodes']
         # newEpisode = {'number': episode['number'], 'name': episode['name'],'overview':episode['overview'],'globalRating':episode['globalRating']}
         # print(self._episodes)
         self._episodes.append(episode)
-        if self._mongo_id:
-            return TVShow.update_one({'_id': self._mongo_id, 'seasons.number': self._number}, {'$addToSet': {'seasons.$.episodes': episode}})
+        if self._tvShow._mongo_id:
+            return TVShow.update_one({'_id': self._tvShow._mongo_id, 'seasons.number': self._number}, {'$addToSet': {'seasons.$.episodes': episode}})
 
 
 class Episode(Cinema):
