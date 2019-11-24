@@ -19,24 +19,28 @@ class Cinema(DAO):
         self._producers = kwargs.get('producers', [])
         self._actors = kwargs.get('actors', [])
         self._genres = kwargs.get('genres', [])
-        self._vote_average = kwargs.get('vote_average') if isinstance(
-            kwargs.get('vote_average', None), int) else None
+        self._vote_average = kwargs.get('vote_average', 0)
         self._ratings = kwargs.get('ratings', [])
         self._vote_count = kwargs.get('vote_count', 0)
-        self._globalRating = kwargs.get('globalRating', self._vote_average)
+        self._globalRating = kwargs.get('globalRating', kwargs.get('vote_average', None))
 
     def _addRating(self, userId, rating):
+        # update instance with data from database
         if not self._mongo_id:
             instance_from_db = type(self).get(name=self._name)
             if instance_from_db:
                 self._mongo_id = instance_from_db._mongo_id
                 self._ratings = instance_from_db._ratings
+        # add new rating
         newRating = {'user': userId, 'rating': rating}
         self._ratings.append(newRating)
+        # compute global rating using a reduced weight for vote_average from api
         self._globalRating = mean(rating['rating'] for rating in self._ratings)
-        if self._vote_average:
-            ratings_count = len(self._ratings)
-            self._globalRating = (ratings_count*self._globalRating+self._vote_count*self._vote_average)/(ratings_count+self._vote_count)
+        ratings_count = len(self._ratings)
+        vote_average = self._vote_average
+        vote_count = int(self._vote_count / 400) + 1
+        self._globalRating = (ratings_count*self._globalRating+vote_count*vote_average)/(ratings_count+vote_count)
+        # if already rated by this user, change old rating - else just add the new one
         alreadyExist = Cinema.get(id=self._id, ratings__user=userId)
         if alreadyExist:
             if self._mongo_id:
