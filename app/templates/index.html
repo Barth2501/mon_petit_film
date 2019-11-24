@@ -57,8 +57,7 @@ function searchInDB (form) {
           content: 'We found the movie / tv show you requested :)\nClick on OK to jump to its description.',
           onAction: function (btnName) {
             if (btnName === 'ok') {
-              var foundUrl = "{{ url_for('movie', movie_id='0') }}".slice(0, -1) + response
-              return location.replace(foundUrl)
+              return location.replace(response)
             }
           }
         })
