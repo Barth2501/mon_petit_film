@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 # from  matplotlib.pyplot import plot, show
 from scipy.sparse.linalg import svds
-from app.classes.movies_and_series import Cinema
+from app.classes.movies_and_series import Movie
 from app.classes.ratings import Ratings
 from app.classes.user import User
 import numpy as np
@@ -16,7 +16,7 @@ def recommend_movies(userID, num_recommendations):
     
     global movies_df
 
-    movies = Cinema.all_values_list(id=1, name=1, genres=1, poster_path=1, _id=0)
+    movies = Movie.all_values_list(id=1, name=1, genres=1, poster_path=1, _id=0)
     if movies_df is None:
         movies_df = pd.DataFrame(movies)
         movies_df = movies_df.astype({'id':'int32'})
