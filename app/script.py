@@ -9,14 +9,14 @@ def add_popular_tvshows():
 
     res = res.json()
 
-    b = TVShow.get(name='The Mandalorian')
-
     for k, serie in enumerate(res['results']):
         i = 1
         a = TVShow(serie['name'], overview=serie['overview'],
                    poster_path=serie['poster_path'], vote_average=serie['vote_average'])
         # Uncomment this line if you want to add tvshows to the mongodb database
         a.save()
+        # a = TVShow.get(name=serie['name'], type={'$exists':True})
+        saisons = []
         while True:
             address = 'https://api.themoviedb.org/3/tv/' + str(serie['id']) + '/season/' + str(
                 i) + '?api_key=' + '55b1aaf3647ecfaac56c76591cc99a09' + '&language=en-US'
@@ -27,10 +27,15 @@ def add_popular_tvshows():
                 saison = saison.json()
                 s = Season(name=saison['name'], number=i, tvShow=a,
                            overview=saison['overview'], poster_path=saison['poster_path'])
+                episode = []
                 for j, ep in enumerate(saison['episodes']):
                     e = Episode(name=ep['name'], number=j+1, season=s,
                                 overview=ep['overview'], globalRating=ep['vote_average'])
+                episode.append(e.json)
                 i += 1
+            saisons.append(s.json)
+        print(saisons)
+        a.update_one({'name':serie['name']},{'$set':{'saisons':saisons}})
         print(a.json)
 
 add_popular_tvshows()
