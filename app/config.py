@@ -1,12 +1,12 @@
 from celery.schedules import crontab
 
-CELERY_BROKER_URL = 'redis://redis:6379/0'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
-CELERY_IMPORTS = ('cronjobs.tasks.test', 'cronjobs.tasks.send_mail')
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_IMPORTS = ("cronjobs.tasks.test", "cronjobs.tasks.send_mail")
 CELERYBEAT_SCHEDULE = {
-    'send-mail-on-monday': {
-        'task': 'cronjobs.tasks.send_mail.send_mail_flask',
-        'schedule': crontab(day_of_week='sunday',minute=0, hour=8),
+    "send-mail-on-monday": {
+        "task": "cronjobs.tasks.send_mail.send_mail_flask",
+        "schedule": crontab(day_of_week="sunday", minute=0, hour=8),
     }
 }
 MAIL_SERVER = "smtp.gmail.com"
