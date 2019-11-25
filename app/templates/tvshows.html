@@ -23,7 +23,7 @@
                 <div class="card h-100" style="min-height:50vh;max-height:50vh;">
                   <h5 class="card-header" style="height:18%;overflow:hidden;text-overflow:ellipsis;">{{ tvshow['name'] }}</h5>
                   <div class="card-body">
-                    <a href="{{ url_for('tvshow', tvshow_id=tvshow['mongo_id']) }}">
+                    <a href="{{ url_for('tvshow', tvshow_id=tvshow['id']) }}">
                       <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{tvshow['poster_path']}}">
                     </a>
                   </div>
@@ -53,7 +53,6 @@
 {% block script %}
 <script>
 $(document).ready(function() {
-  $('#carousel_reco').find('.carousel-item').first().addClass('active')
   for (const genre of {{ genres_list|tojson }}) {
     $('#carousel' + genre.name).find('.carousel-item').first().addClass('active')
   }

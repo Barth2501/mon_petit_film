@@ -121,7 +121,7 @@ def tvshows():
     return render_template('tvshows.html', genres_list=genres_list, tvshows_by_genre=tvshows_by_genre)
 
 
-@app.route('/tvshows/tvshow=<string:tvshow_id>')
+@app.route('/tvshows/tvshow=<int:tvshow_id>')
 def tvshow(tvshow_id):
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
@@ -129,7 +129,7 @@ def tvshow(tvshow_id):
     tvshow['globalRating'] = float("{0:.2f}".format(
         tvshow['globalRating'])) if tvshow['globalRating'] else 'Not rated yet'
     user = User.get(username=session['username'])
-    rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
+    rating = Ratings.get(cinema=tvshow_id, user=user._mongo_id)
     my_rating = rating._rating if rating else 'Not rated yet'
     return render_template('tvshow.html', tvshow=tvshow, my_rating=my_rating)
 
