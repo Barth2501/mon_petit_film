@@ -57,20 +57,12 @@ def first_ratings():
 # Movies pages
 @app.route("/movies", methods=["GET"])
 def movies():
-<<<<<<< HEAD
     from app.celery import hello
-    
     hello.delay()
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
     reco_movies = recommend_movies(session['id'], 80)[1]
     dict_reco_movies = reco_movies.to_dict('records')
-=======
-    if "username" not in session or "id" not in session:
-        return redirect(url_for("index"))
-    reco_movies = recommend_movies(session["id"], 80)[1]
-    dict_reco_movies = reco_movies.to_dict("records")
->>>>>>> 9e8f079e91c2c2f4f4d68e0d59675f858a7e9d55
     genres_list = []
     movies_by_genre = {}
     for genre in genres_db.find():
