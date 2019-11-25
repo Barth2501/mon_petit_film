@@ -1,16 +1,26 @@
-<!doctype html>
-{% extends 'base_template.html'%}
-
-{% block content %}
+<!DOCTYPE html>
+{% extends 'base_template.html'%} {% block content %}
 <div class="row">
   <div class="card w-100">
     <h4 class="card-header bg-secondary">Our selection for you</h4>
     <div class="card-body">
       <div id="carousel_reco" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
-          <li data-target="#carousel_reco" data-slide-to="0" class="bg-secondary active"></li>
-          <li data-target="#carousel_reco" data-slide-to="1" class="bg-secondary"></li>
-          <li data-target="#carousel_reco" data-slide-to="2" class="bg-secondary"></li>
+          <li
+            data-target="#carousel_reco"
+            data-slide-to="0"
+            class="bg-secondary active"
+          ></li>
+          <li
+            data-target="#carousel_reco"
+            data-slide-to="1"
+            class="bg-secondary"
+          ></li>
+          <li
+            data-target="#carousel_reco"
+            data-slide-to="2"
+            class="bg-secondary"
+          ></li>
         </ol>
         <div class="carousel-inner" role="listbox">
           {% for i in range(3) %}
@@ -19,11 +29,22 @@
               <div class="col-md-1"></div>
               {% for movie in dict_reco_movies[i*5:(i+1)*5] %}
               <div class="col-md-2">
-                <div class="card h-100" style="min-height:50vh;max-height:50vh;">
-                  <h5 class="card-header" style="height:18%;overflow:hidden;text-overflow:ellipsis;">{{ movie['name'] }}</h5>
+                <div
+                  class="card h-100"
+                  style="min-height:50vh;max-height:50vh;"
+                >
+                  <h5
+                    class="card-header"
+                    style="height:18%;overflow:hidden;text-overflow:ellipsis;"
+                  >
+                    {{ movie['name'] }}
+                  </h5>
                   <div class="card-body">
                     <a href="{{ url_for('movie', movie_id=movie['id']) }}">
-                      <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}">
+                      <img
+                        class="d-block w-100"
+                        src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}"
+                      />
                     </a>
                   </div>
                 </div>
@@ -34,11 +55,21 @@
           </div>
           {% endfor %}
         </div>
-        <a class="carousel-control-prev" href="#carousel_reco" role="button" data-slide="prev">
+        <a
+          class="carousel-control-prev"
+          href="#carousel_reco"
+          role="button"
+          data-slide="prev"
+        >
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="sr-only">Previous</span>
         </a>
-        <a class="carousel-control-next" href="#carousel_reco" role="button" data-slide="next">
+        <a
+          class="carousel-control-next"
+          href="#carousel_reco"
+          role="button"
+          data-slide="next"
+        >
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
           <span class="sr-only">Next</span>
         </a>
@@ -51,11 +82,27 @@
   <div class="card w-100">
     <h4 class="card-header bg-secondary">{{ genre['verbose_name'] }}</h4>
     <div class="card-body">
-      <div id="carousel{{genre['name']}}" class="carousel slide" data-ride="carousel">
+      <div
+        id="carousel{{genre['name']}}"
+        class="carousel slide"
+        data-ride="carousel"
+      >
         <ol class="carousel-indicators">
-          <li data-target="#carousel{{genre['name']}}" data-slide-to="0" class="bg-secondary active"></li>
-          <li data-target="#carousel{{genre['name']}}" data-slide-to="1" class="bg-secondary"></li>
-          <li data-target="#carousel{{genre['name']}}" data-slide-to="2" class="bg-secondary"></li>
+          <li
+            data-target="#carousel{{genre['name']}}"
+            data-slide-to="0"
+            class="bg-secondary active"
+          ></li>
+          <li
+            data-target="#carousel{{genre['name']}}"
+            data-slide-to="1"
+            class="bg-secondary"
+          ></li>
+          <li
+            data-target="#carousel{{genre['name']}}"
+            data-slide-to="2"
+            class="bg-secondary"
+          ></li>
         </ol>
         <div class="carousel-inner" role="listbox">
           {% for i in range(3) %}
@@ -64,11 +111,22 @@
               <div class="col-md-1"></div>
               {% for movie in movies_by_genre[genre['name']][i*5:(i+1)*5] %}
               <div class="col-md-2">
-                <div class="card h-100" style="min-height:50vh;max-height:50vh;">
-                  <h5 class="card-header" style="height:18%;overflow:hidden;text-overflow:ellipsis;">{{ movie['name'] }}</h5>
+                <div
+                  class="card h-100"
+                  style="min-height:50vh;max-height:50vh;"
+                >
+                  <h5
+                    class="card-header"
+                    style="height:18%;overflow:hidden;text-overflow:ellipsis;"
+                  >
+                    {{ movie['name'] }}
+                  </h5>
                   <div class="card-body">
                     <a href="{{ url_for('movie', movie_id=movie['id']) }}">
-                      <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}">
+                      <img
+                        class="d-block w-100"
+                        src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}"
+                      />
                     </a>
                   </div>
                 </div>
@@ -79,11 +137,21 @@
           </div>
           {% endfor %}
         </div>
-        <a class="carousel-control-prev" href="#carousel{{genre['name']}}" role="button" data-slide="prev">
+        <a
+          class="carousel-control-prev"
+          href="#carousel{{genre['name']}}"
+          role="button"
+          data-slide="prev"
+        >
           <span class="carousel-control-prev-icon" aria-hidden="true"></span>
           <span class="sr-only">Previous</span>
         </a>
-        <a class="carousel-control-next" href="#carousel{{genre['name']}}" role="button" data-slide="next">
+        <a
+          class="carousel-control-next"
+          href="#carousel{{genre['name']}}"
+          role="button"
+          data-slide="next"
+        >
           <span class="carousel-control-next-icon" aria-hidden="true"></span>
           <span class="sr-only">Next</span>
         </a>
@@ -91,16 +159,13 @@
     </div>
   </div>
 </div>
-{% endfor %}
-{% endblock content %}
-
-{% block script %}
+{% endfor %} {% endblock content %} {% block script %}
 <script>
-$(document).ready(function() {
-  $('#carousel_reco').find('.carousel-item').first().addClass('active')
-  for (const genre of {{ genres_list|tojson }}) {
-    $('#carousel' + genre.name).find('.carousel-item').first().addClass('active')
-  }
-})
+  $(document).ready(function() {
+    $('#carousel_reco').find('.carousel-item').first().addClass('active')
+    for (const genre of {{ genres_list|tojson }}) {
+      $('#carousel' + genre.name).find('.carousel-item').first().addClass('active')
+    }
+  })
 </script>
 {% endblock script %}

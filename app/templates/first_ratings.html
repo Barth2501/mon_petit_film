@@ -1,42 +1,43 @@
-{% extends 'base_template.html' %}
-
-{% block content %}
-<h1 class='pt-2'>Please rate a few movies and couch back</h1>
-<div id='movie_rate' class='d-flex flex-row'>
-  <div class='p-2 h-25' id='image'>
-    <img id='mon_image' class="d-block" src="https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}" alt="First slide" >
+{% extends 'base_template.html' %} {% block content %}
+<h1 class="pt-2">Please rate a few movies and couch back</h1>
+<div id="movie_rate" class="d-flex flex-row">
+  <div class="p-2 h-25" id="image">
+    <img
+      id="mon_image"
+      class="d-block"
+      src="https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}"
+      alt="First slide"
+    />
   </div>
-  <div class='p-2 align-self-center'>
-    <div id='title'>
+  <div class="p-2 align-self-center">
+    <div id="title">
       <h3>{{film_sample[0]['name']}}</h3>
     </div>
-    <div id='description' class='h-50'>
+    <div id="description" class="h-50">
       <p>{{film_sample[0]['overview']}}</p>
     </div>
-      <a id='unseen' class="fas fa-eye-slash fa-2x"></a>
-    <div id='star1' class='starrr p-2'></div>
+    <a id="unseen" class="fas fa-eye-slash fa-2x"></a>
+    <div id="star1" class="starrr p-2"></div>
   </div>
 </div>
 <style>
-  .overflow: {
-    overflow:hidden
-    text-overflow: ellipsis;
-  }
- .starrr {
-  display: inline-block; }
-  .starrr a {
-    font-size: 26px;
-    padding: 4px;
-    height:20px;
-    width:20px;
-    cursor: pointer;
-    color: gold;
-    text-decoration: none; }
+   .overflow: {
+     overflow:hidden
+     text-overflow: ellipsis;
+   }
+  .starrr {
+   display: inline-block; }
+   .starrr a {
+     font-size: 26px;
+     padding: 4px;
+     height:20px;
+     width:20px;
+     cursor: pointer;
+     color: gold;
+     text-decoration: none; }
 </style>
-{% endblock content %}
-
-{% block script %}
-  <!-- rating.js file -->
+{% endblock content %} {% block script %}
+<!-- rating.js file -->
 <script src="../static/js/addons/rating.js"></script>
 <script>
   $(document).ready(function() {
@@ -52,7 +53,7 @@
         $('#title').replaceWith( "<div id='title'><h3>" + film_sample[counter]['name'] + '</h3></div>');
         $('#description').replaceWith("<div id='description' class='h-50'><p>" + film_sample[counter]['overview'] + '</p></div>')
       }
-      
+
     })
     $('#star1').starrr({
       change: function(e, value){
