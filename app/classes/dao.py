@@ -16,28 +16,34 @@ class DAO:
     def all_values_list(cls, **kwargs):
         columns = {}
         for key in kwargs.keys():
-            columns[key.replace('__', '.')] = kwargs[key]
-        return db[cls._collection].find({'type': { '$exists': False }}, columns)
+            columns[key.replace("__", ".")] = kwargs[key]
+        return db[cls._collection].find({}, columns)
 
     @classmethod
     def filter(cls, limit=0, **kwargs):
         filters = {}
         for key in kwargs.keys():
-            filters[key.replace('__', '.')] = kwargs[key]
-        return [cls(**instance) for instance in db[cls._collection].find(filters).limit(limit)]
+            filters[key.replace("__", ".")] = kwargs[key]
+        return [
+            cls(**instance)
+            for instance in db[cls._collection].find(filters).limit(limit)
+        ]
 
     @classmethod
     def filter_json(cls, limit=0, **kwargs):
         filters = {}
         for key in kwargs.keys():
-            filters[key.replace('__', '.')] = kwargs[key]
-        return [cls(**instance).json for instance in db[cls._collection].find(filters).limit(limit)]
+            filters[key.replace("__", ".")] = kwargs[key]
+        return [
+            cls(**instance).json
+            for instance in db[cls._collection].find(filters).limit(limit)
+        ]
 
     @classmethod
     def get(cls, **kwargs):
         filters = {}
         for key in kwargs.keys():
-            filters[key.replace('__', '.')] = kwargs[key]
+            filters[key.replace("__", ".")] = kwargs[key]
         found = db[cls._collection].find_one(filters)
         return cls(**found) if found else None
 
@@ -57,19 +63,23 @@ class DAO:
     def delete_one(cls, query):
         return db[cls._collection].delete_one(query)
 
+    @classmethod
+    def find_many(cls, query={}, projection={}):
+        return db[cls._collection].find(query, projection)
+
     def save(self):
         if not self._mongo_id:
             instance_from_db = type(self).get(name=self._name)
             if instance_from_db:
                 self._mongo_id = instance_from_db._mongo_id
         if self._mongo_id:
-            return type(self).replace_one({'_id': self._mongo_id}, {'$set': self.json})
+            return type(self).replace_one({"_id": self._mongo_id}, {"$set": self.json})
         else:
             return type(self).insert_one(self.json)
 
     def delete(self):
         deleted_in_db = False
         if self._mongo_id:
-            type(self).delete_one({'_id': self._mongo_id})
+            type(self).delete_one({"_id": self._mongo_id})
             deleted_in_db = True
         return deleted_in_db

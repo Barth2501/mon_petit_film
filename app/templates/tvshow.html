@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-{% extends 'base_template.html'%} 
-{% block content %}
+{% extends 'base_template.html'%} {% block content %}
 <div class="row">
   <div class="col-md-6">
     <a>
       <img
         class="img-fluid rounded mb-3 mb-md-0"
+        href="{{tvshow['homepage']}}"
         src="https://image.tmdb.org/t/p/w500/{{tvshow['poster_path']}}"
         alt=""
       />
@@ -26,40 +26,6 @@
       <div id="star1" class="starrr"></div>
     </div>
   </div>
-</div>
-<div id='seasons'>
-{% for season in tvshow['seasons'] %}
-<div class="row" id='season'>
-    <div class="col-md-6">
-      <a>
-        <img
-          class="img-fluid rounded mb-3 mb-md-0"
-          src="https://image.tmdb.org/t/p/w500/{{season['poster_path']}}"
-          alt=""
-        />
-      </a>
-    </div>
-    <div class="col-md-6 align-self-center">
-      <div class="row justify-content-center" style="text-align:center">
-        <h3>{{season['name']}}</h3>
-        <p>{{season['overview']}}</p>
-      </div>
-    </div>
-  </div>
-  {% for episode in season['episodes'] %}
-  <div class="row">
-    <div class="col-md-6 align-self-center">
-      <div class="row justify-content-center" style="text-align:center">
-        <h3>{{episode['name']}}</h3>
-        <p>{{episode['overview']}}</p>
-      </div>
-      <div class="row justify-content-center">
-        <h4>Global rating: {{episode['globalRating']}}</h4>
-      </div>
-    </div>
-  </div>
-  {% endfor %}
-{% endfor %}
 </div>
 <style>
   .starrr {
@@ -88,7 +54,7 @@
               url: "{{ url_for('add_rating') }}",
               type: 'POST',
               contentType: 'application/json;charset=UTF-8',
-              data: JSON.stringify({'tvshowId':{{ tvshow['mongo_id'] }},'rating':value}),
+              data: JSON.stringify({'cinemaId':{{ tvshow['id'] }},'rating':value}),
               error: xhr => {
                   alert(xhr.responseText.split('\n')[1])
               }
