@@ -6,7 +6,7 @@ CELERY_IMPORTS = ('cronjobs.tasks.test', 'cronjobs.tasks.send_mail')
 CELERYBEAT_SCHEDULE = {
     'send-mail-on-monday': {
         'task': 'cronjobs.tasks.send_mail.send_mail_flask',
-        'schedule': crontab(minute="*"),
+        'schedule': crontab(day_of_week='sunday',minute=0, hour=8),
     }
 }
 MAIL_SERVER = "smtp.gmail.com"
