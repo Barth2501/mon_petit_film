@@ -91,7 +91,8 @@ def add_rating():
         return 'Not logged in'
     cinemaId = request.json['cinemaId']
     rating = request.json['rating']
-    cinema = Cinema.get(id=cinemaId)
+    cinemaClass = Movie if cinemaId < 500000 else TVShow
+    cinema = cinemaClass.get(id=cinemaId)
     user = User.get(username=session['username'])
     rat = Ratings(rating=rating, cinema=cinema, user=user)
     rat.save()
