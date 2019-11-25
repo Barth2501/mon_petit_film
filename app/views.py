@@ -20,7 +20,6 @@ mongo = PyMongo(app)
 
 genres_db = mongo.db.genres
 genres_tvshow_db = mongo.db.genres_tvshow
-movies_db = mongo.db.movies
 
 
 @app.route('/')
@@ -206,48 +205,6 @@ def movie(movie_id):
     rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
     my_rating = rating._rating if rating else 'Not rated yet'
     return render_template('movie.html', movie=movie, my_rating=my_rating)
-
-
-# @app.route('/add_movie', methods=['POST'])
-# def add_movie():
-#     movie = mongo.db.movies
-#     try:
-#         name = request.json['name']
-#         description = request.json['description']
-#         movie_id = movie.insert({'name': name, 'description': description})
-#         new_movie = movie.find_one({'_id': movie_id})
-#         output = {'name': new_movie['name']}
-#         return jsonify({'result': output})
-#     except TypeError:
-#         return jsonify({'result': 'niet'})
-
-
-# @app.route('/add_movie', methods=['GET'])
-# def all_movie():
-#     movie = mongo.db.movies
-#     output = []
-#     for s in movie.find():
-#         try:
-#             output.append({
-#                 'original_title': s['original_title']
-#             })
-#         except KeyError:
-#             continue
-#     return jsonify({'result': output})
-
-
-# from app.collab_filter import movie_rating_merged_data
-
-# @app.route('/collab_filter')
-# def colab_filter():
-#     #for movie in movies_db.find():
-#     #    id = movie['id']
-#     #    try:
-#     #        DB.update_one(collection='movies', query={'id': id}, new_values= {'$set': {'id':int(id)}})
-#     #    except ValueError:
-#     #        DB.delete_one(collection='movies',query={'id':id})
-#     print(movie_rating_merged_data)
-#     pass
 
 
 @app.route('/profile', methods=['GET'])
