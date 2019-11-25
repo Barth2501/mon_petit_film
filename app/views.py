@@ -74,20 +74,16 @@ def movies():
                         reco_movies.iloc[i, :].to_dict())
                     count += 1
         genres_list.append((genre, count))
-
-    # tej les genres moins importants
+    # supprimer les genres moins importants pour cet utilisateur
     genres_list.sort(key=lambda tup: tup[1], reverse=True)
     genres_list, genres_list_pop = [g[0] for g in genres_list[:8]], [
         g[0] for g in genres_list[8:]]
     for genre in genres_list_pop:
         movies_by_genre.pop(genre['name'])
-
     # rajouter des films random si pas assez de ce type avec la prediction
     for genre in genres_list:
         if len(movies_by_genre[genre['name']]) < 15:
-            movies = Movie.filter(
-                genres__name=genre['verbose_name'], limit=15-len(movies_by_genre[genre['name']]))
-            for movie in movies:
+            for movie in Movie.filter(genres__name=genre['verbose_name'], limit=15-len(movies_by_genre[genre['name']])):
                 movies_by_genre[genre['name']].append(movie.json)
 
     return render_template('movies.html', dict_reco_movies=dict_reco_movies, genres_list=genres_list, movies_by_genre=movies_by_genre)
@@ -116,33 +112,20 @@ def movie(movie_id):
 
 # TV Shows pages
 
-@app.route('/tvshows')
+@app.route('/tvshows', methods=['GET'])
 def tvshows():
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
-    tvshows = TVShow.filter_json()
     genres_list = []
     tvshows_by_genre = {}
     for genre in genres_tvshow_db.find():
         genre.pop('_id')
         genre['verbose_name'] = genre['name']
-        genre['name'] = genre['name'].replace(' ', '')
-        genre['name'] = genre['name'].replace('&', '')
+        genre['name'] = genre['name'].replace(' ', '').replace('&', '')
+        genres_list.append(genre)
         tvshows_by_genre[genre['name']] = []
-        count = 0
-        for tvshow in tvshows:
-            for j in range(min(2, len(tvshow['genres']))):
-                if tvshow['genres'][j] == genre['id']:
-                    tvshows_by_genre[genre['name']].append(tvshow)
-                    count += 1
-        genres_list.append((genre, count))
-
-    genres_list.sort(key=lambda tup: tup[1], reverse=True)
-    genres_list, genres_list_pop = [g[0] for g in genres_list[:8]], [
-        g[0] for g in genres_list[8:]]
-    for genre in genres_list_pop:
-        tvshows_by_genre.pop(genre['name'])
-
+        for tvshow in TVShow.filter(genres=genre['id'], limit=15):
+            tvshows_by_genre[genre['name']].append(tvshow.json)
     return render_template('tvshows.html', genres_list=genres_list, tvshows_by_genre=tvshows_by_genre)
 
 
