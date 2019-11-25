@@ -1,15 +1,12 @@
-# import os
 from flask import render_template, redirect, url_for, Flask, request, session, flash
 from flask_pymongo import PyMongo
 from app.classes.user import User
 from app.classes.ratings import Ratings
-from app.classes.movies_and_series import Cinema, Movie, TVShow
+from app.classes.movies_and_series import Movie, TVShow
 from app.svd import recommend_movies
 import random
-from bson.objectid import ObjectId
 from flask_mail import Mail
 import app.config as config
-from celery import Celery
 
 app = Flask(__name__)
 app.config.from_object(config)
