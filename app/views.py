@@ -9,7 +9,6 @@ from flask_mail import Mail
 import app.config as config
 
 
-
 app = Flask(__name__)
 app.config.from_object(config)
 
@@ -57,12 +56,12 @@ def first_ratings():
 # Movies pages
 @app.route("/movies", methods=["GET"])
 def movies():
-    from app.celery import hello
-    hello.delay()
-    if 'username' not in session or 'id' not in session:
-        return redirect(url_for('index'))
-    reco_movies = recommend_movies(session['id'], 80)[1]
-    dict_reco_movies = reco_movies.to_dict('records')
+    # from app.celery import hello
+    # hello.delay()
+    if "username" not in session or "id" not in session:
+        return redirect(url_for("index"))
+    reco_movies = recommend_movies(session["id"], 80)[1]
+    dict_reco_movies = reco_movies.to_dict("records")
     genres_list = []
     movies_by_genre = {}
     for genre in genres_db.find():
@@ -134,7 +133,10 @@ def tvshows():
         genre["name"] = genre["name"].replace(" ", "").replace("&", "")
         genres_list.append(genre)
         tvshows_by_genre[genre["name"]] = []
-        for tvshow in TVShow.filter(genres=genre["id"], limit=15):
+        # add well-known tv shows (no reco for tv shows)
+        for tvshow in TVShow.filter_and_sort(
+            genres=genre["id"], limit=15, sort=[("vote_count", -1)]
+        ):
             tvshows_by_genre[genre["name"]].append(tvshow.json)
     return render_template(
         "tvshows.html", genres_list=genres_list, tvshows_by_genre=tvshows_by_genre
