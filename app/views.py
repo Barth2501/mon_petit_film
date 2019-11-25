@@ -89,9 +89,9 @@ def first_ratings():
 def add_rating():
     if 'username' not in session:
         return 'Not logged in'
-    movieId = request.json['movieId']
+    cinemaId = request.json['cinemaId']
     rating = request.json['rating']
-    cinema = Cinema.get(id=movieId)
+    cinema = Cinema.get(id=cinemaId)
     user = User.get(username=session['username'])
     rat = Ratings(rating=rating, cinema=cinema, user=user)
     rat.save()

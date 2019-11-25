@@ -54,7 +54,7 @@
               url: "{{ url_for('add_rating') }}",
               type: 'POST',
               contentType: 'application/json;charset=UTF-8',
-              data: JSON.stringify({'movieId':{{ movie['id'] }},'rating':value}),
+              data: JSON.stringify({'cinemaId':{{ movie['id'] }},'rating':value}),
               error: xhr => {
                   alert(xhr.responseText.split('\n')[1])
               }

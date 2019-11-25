@@ -61,7 +61,7 @@
           url: "{{ url_for('add_rating') }}",
           type: 'POST',
           contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify({'movieId':film_sample[counter]['id'],'rating':value}),
+          data: JSON.stringify({'cinemaId':film_sample[counter]['id'],'rating':value}),
           success: res => {
             if (counter == film_sample.length) {
               window.location.href="{{ url_for('index') }}"
