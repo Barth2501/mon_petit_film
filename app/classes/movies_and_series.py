@@ -20,9 +20,9 @@ class Cinema(DAO):
         self._actors = kwargs.get('actors', [])
         self._genres = kwargs.get('genres', [])
         self._vote_average = kwargs.get('vote_average', 0)
-        self._ratings = kwargs.get('ratings', [])
         self._vote_count = kwargs.get('vote_count', 0)
         self._globalRating = kwargs.get('globalRating', kwargs.get('vote_average', None))
+        self._ratings = kwargs.get('ratings', [])
 
     def _addRating(self, userId, rating):
         # update instance with data from database
@@ -78,9 +78,10 @@ class Movie(Cinema):
             'actors': self._actors,
             'genres': self._genres,
             'vote_average': self._vote_average,
-            'ratings': self._ratings,
+            'vote_count': self._vote_count,
+            'globalRating': self._globalRating,
             'runtime': self._runtime,
-            'globalRating': self._globalRating
+            'ratings': self._ratings,
         }
 
 
@@ -99,15 +100,16 @@ class TVShow(Cinema):
             'overview': self._overview,
             'homepage': self._homepage,
             'id': self._id,
-            'mongo_id': str(self._mongo_id),
             'poster_path': self._poster_path,
             'release_date': self._release_date,
             'makers': self._makers,
             'producers': self._producers,
             'actors': self._actors,
             'genres': self._genres,
-            'globalRating': self._globalRating,
+            'vote_average': self._vote_average,
+            'vote_count': self._vote_count,
             'ratings': self._ratings,
+            'globalRating': self._globalRating,
             'seasons': self._seasons,
         }
 
