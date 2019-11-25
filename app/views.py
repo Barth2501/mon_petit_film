@@ -89,14 +89,6 @@ def movies():
     return render_template('movies.html', dict_reco_movies=dict_reco_movies, genres_list=genres_list, movies_by_genre=movies_by_genre)
 
 
-@app.route('/movies/genre=<int:genre_id>')
-def genre(genre_id):
-    if 'username' not in session or 'id' not in session:
-        return redirect(url_for('index'))
-    movies = Movie.filter_json(vote_count={'$gt': 2000}, genres__id=genre_id)
-    return render_template('genre.html', movies=movies, genre_id=genre_id)
-
-
 @app.route('/movies/movie=<int:movie_id>')
 def movie(movie_id):
     if 'username' not in session or 'id' not in session:
@@ -127,14 +119,6 @@ def tvshows():
         for tvshow in TVShow.filter(genres=genre['id'], limit=15):
             tvshows_by_genre[genre['name']].append(tvshow.json)
     return render_template('tvshows.html', genres_list=genres_list, tvshows_by_genre=tvshows_by_genre)
-
-
-@app.route('/tvshows/genre=<int:genre_id>')
-def genre_tvshows(genre_id):
-    if 'username' not in session or 'id' not in session:
-        return redirect(url_for('index'))
-    tvshows = TVShow.filter_json(genres__id=genre_id)
-    return render_template('genre_tvshows.html', tvshows=tvshows, genre_id=genre_id)
 
 
 @app.route('/tvshows/tvshow=<string:tvshow_id>')

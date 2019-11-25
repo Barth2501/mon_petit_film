@@ -23,7 +23,7 @@
                   <h5 class="card-header" style="height:18%;overflow:hidden;text-overflow:ellipsis;">{{ movie['name'] }}</h5>
                   <div class="card-body">
                     <a href="{{ url_for('movie', movie_id=movie['id']) }}">
-                      <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500{{movie['poster_path']}}">
+                      <img class="d-block w-100" src="https://image.tmdb.org/t/p/w500/{{movie['poster_path']}}">
                     </a>
                   </div>
                 </div>
@@ -49,9 +49,7 @@
 {% for genre in genres_list %}
 <div class="row">
   <div class="card w-100">
-    <a href="{{ url_for('genre', genre_id=genre['id']) }}", style="all:unset;">
-      <h4 class="card-header bg-secondary">{{ genre['verbose_name'] }}</h4>
-    </a>
+    <h4 class="card-header bg-secondary">{{ genre['verbose_name'] }}</h4>
     <div class="card-body">
       <div id="carousel{{genre['name']}}" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
