@@ -22,6 +22,10 @@ genres_db = mongo.db.genres
 genres_tvshow_db = mongo.db.genres_tvshow
 
 
+### GET ROUTES (PAGES)
+
+# Home
+
 @app.route('/')
 def home():
     return redirect(url_for('index'))
@@ -32,42 +36,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/logout', methods=['POST'])
-def logout():
-    session.pop('username', None)
-    session.pop('id', None)
-    return redirect(url_for('index'))
-
-
-@app.route('/login', methods=['POST'])
-def login():
-    username = request.form['username']
-    password = request.form['password']
-    user = User.get(username=username, password=password)
-    if user:
-        session['username'] = username
-        session['id'] = user.mongo_id
-    else:
-        flash('wrong password!')
-    return home()
-
-
-@app.route('/signup', methods=['POST'])
-def signup():
-    username = request.form['username']
-    password = request.form['password']
-    email = request.form['email']
-    if User.get(username=username):
-        flash('This user already exists')
-        return home()
-    else:
-        user = User(username=username, emailAddress=email, password=password)
-        user.save()
-        user = User.get(username=username)
-        session['username'] = username
-        session['id'] = user.mongo_id
-        return redirect(url_for('first_ratings'))
-
+# First ratings after signup
 
 @app.route('/first_ratings', methods=['GET'])
 def first_ratings():
@@ -84,19 +53,7 @@ def first_ratings():
     return render_template('first_ratings.html', film_sample=film_sample, poster_sample=poster_sample, id_sample=id_sample)
 
 
-@app.route('/add_rating', methods=['POST'])
-def add_rating():
-    if 'username' not in session:
-        return 'Not logged in'
-    cinemaId = request.json['cinemaId']
-    rating = request.json['rating']
-    cinemaClass = Movie if cinemaId < 500000 else TVShow
-    cinema = cinemaClass.get(id=cinemaId)
-    user = User.get(username=session['username'])
-    rat = Ratings(rating=rating, cinema=cinema, user=user)
-    rat.save()
-    return 'done'
-
+# Movies pages
 
 @app.route('/movies', methods=['GET'])
 def movies():
@@ -138,6 +95,29 @@ def movies():
 
     return render_template('movies.html', dict_reco_movies=dict_reco_movies, genres_list=genres_list, movies_by_genre=movies_by_genre)
 
+
+@app.route('/movies/genre=<int:genre_id>')
+def genre(genre_id):
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
+    movies = Movie.filter_json(vote_count={'$gt': 2000}, genres__id=genre_id)
+    return render_template('genre.html', movies=movies, genre_id=genre_id)
+
+
+@app.route('/movies/movie=<int:movie_id>')
+def movie(movie_id):
+    if 'username' not in session or 'id' not in session:
+        return redirect(url_for('index'))
+    movie = Movie.get(id=movie_id).json
+    movie['globalRating'] = float("{0:.2f}".format(
+        movie['globalRating'])) if movie['globalRating'] else 'Not rated yet'
+    user = User.get(username=session['username'])
+    rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
+    my_rating = rating._rating if rating else 'Not rated yet'
+    return render_template('movie.html', movie=movie, my_rating=my_rating)
+
+
+# TV Shows pages
 
 @app.route('/tvshows')
 def tvshows():
@@ -181,31 +161,16 @@ def genre_tvshows(genre_id):
 def tvshow(tvshow_id):
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
-    tvshow = TVShow.filter_json(_id=ObjectId(tvshow_id))[0]
-    print(tvshow['seasons'][0])
-    return render_template('tvshow.html', tvshow=tvshow)
-
-
-@app.route('/movies/genre=<int:genre_id>')
-def genre(genre_id):
-    if 'username' not in session or 'id' not in session:
-        return redirect(url_for('index'))
-    movies = Movie.filter_json(vote_count={'$gt': 2000}, genres__id=genre_id)
-    return render_template('genre.html', movies=movies, genre_id=genre_id)
-
-
-@app.route('/movies/movie=<int:movie_id>')
-def movie(movie_id):
-    if 'username' not in session or 'id' not in session:
-        return redirect(url_for('index'))
-    movie = Movie.get(id=movie_id).json
-    movie['globalRating'] = float("{0:.2f}".format(
-        movie['globalRating'])) if movie['globalRating'] else 'Not rated yet'
+    tvshow = TVShow.get(id=tvshow_id).json
+    tvshow['globalRating'] = float("{0:.2f}".format(
+        tvshow['globalRating'])) if tvshow['globalRating'] else 'Not rated yet'
     user = User.get(username=session['username'])
     rating = Ratings.get(cinema=movie_id, user=user._mongo_id)
     my_rating = rating._rating if rating else 'Not rated yet'
-    return render_template('movie.html', movie=movie, my_rating=my_rating)
+    return render_template('tvshow.html', tvshow=tvshow, my_rating=my_rating)
 
+
+# Profile page
 
 @app.route('/profile', methods=['GET'])
 def profile():
@@ -213,6 +178,65 @@ def profile():
         return redirect(url_for('index'))
     return render_template('profile.html')
 
+
+### POST ROUTES
+
+# Authentication
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form['username']
+    password = request.form['password']
+    email = request.form['email']
+    if User.get(username=username):
+        flash('This user already exists')
+        return home()
+    else:
+        user = User(username=username, emailAddress=email, password=password)
+        user.save()
+        user = User.get(username=username)
+        session['username'] = username
+        session['id'] = user.mongo_id
+        return redirect(url_for('first_ratings'))
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+    user = User.get(username=username, password=password)
+    if user:
+        session['username'] = username
+        session['id'] = user.mongo_id
+    else:
+        flash('wrong password!')
+    return home()
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('username', None)
+    session.pop('id', None)
+    return redirect(url_for('index'))
+
+
+# Add rating
+
+@app.route('/add_rating', methods=['POST'])
+def add_rating():
+    if 'username' not in session:
+        return 'Not logged in'
+    cinemaId = request.json['cinemaId']
+    rating = request.json['rating']
+    cinemaClass = Movie if cinemaId < 500000 else TVShow
+    cinema = cinemaClass.get(id=cinemaId)
+    user = User.get(username=session['username'])
+    rat = Ratings(rating=rating, cinema=cinema, user=user)
+    rat.save()
+    return 'done'
+
+
+# Search
 
 @app.route('/search_in_db', methods=['POST'])
 def search_in_db():
