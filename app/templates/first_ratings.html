@@ -21,67 +21,96 @@
   </div>
 </div>
 <style>
-   .overflow: {
-     overflow:hidden
-     text-overflow: ellipsis;
-   }
+  .overflow: {
+    overflow:hidden
+    text-overflow: ellipsis;
+  }
   .starrr {
-   display: inline-block; }
-   .starrr a {
-     font-size: 26px;
-     padding: 4px;
-     height:20px;
-     width:20px;
-     cursor: pointer;
-     color: gold;
-     text-decoration: none; }
+   display: inline-block;
+  }
+  .starrr a {
+    font-size: 26px;
+    padding: 4px;
+    height:20px;
+    width:20px;
+    cursor: pointer;
+    color: gold;
+    text-decoration: none
+  }
 </style>
 {% endblock content %} {% block script %}
 <!-- rating.js file -->
 <script src="../static/js/addons/rating.js"></script>
 <script>
   $(document).ready(function() {
-    $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}")
-    var counter = 0
-    var film_sample = {{film_sample|tojson}};
-    $('#unseen').on('click',function() {
-      counter = counter + 1
+    $("#mon_image").attr(
+      "src",
+      "https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}"
+    );
+    var counter = 0;
+    var film_sample = JSON.parse(`{{film_sample|tojson}}`);
+    $("#unseen").on("click", function() {
+      counter = counter + 1;
       if (counter == film_sample.length) {
-              window.location.href="{{ url_for('index') }}"
+        window.location.href = "{{ url_for('index') }}";
       } else {
-        $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/" + film_sample[counter]['poster_path']);
-        $('#title').replaceWith( "<div id='title'><h3>" + film_sample[counter]['name'] + '</h3></div>');
-        $('#description').replaceWith("<div id='description' class='h-50'><p>" + film_sample[counter]['overview'] + '</p></div>')
+        $("#mon_image").attr(
+          "src",
+          "https://image.tmdb.org/t/p/w500/" +
+            film_sample[counter]["poster_path"]
+        );
+        $("#title").replaceWith(
+          "<div id='title'><h3>" + film_sample[counter]["name"] + "</h3></div>"
+        );
+        $("#description").replaceWith(
+          "<div id='description' class='h-50'><p>" +
+            film_sample[counter]["overview"] +
+            "</p></div>"
+        );
       }
-
-    })
-    $('#star1').starrr({
-      change: function(e, value){
+    });
+    $("#star1").starrr({
+      change: function(e, value) {
         if (value) {
           $.ajax({
-          url: "{{ url_for('add_rating') }}",
-          type: 'POST',
-          contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify({'cinemaId':film_sample[counter]['id'],'rating':value}),
-          success: res => {
-            if (counter == film_sample.length) {
-              $.ajax({
-                url: "{{ url_for('send_mail') }}",
-              })
-              window.location.href="{{ url_for('index') }}"
+            url: "{{ url_for('add_rating') }}",
+            type: "POST",
+            contentType: "application/json;charset=UTF-8",
+            data: JSON.stringify({
+              cinemaId: film_sample[counter]["id"],
+              rating: value
+            }),
+            success: res => {
+              if (counter == film_sample.length) {
+                $.ajax({
+                  url: "{{ url_for('send_mail') }}"
+                });
+                window.location.href = "{{ url_for('index') }}";
+              }
+            },
+            error: xhr => {
+              alert(xhr.responseText.split("\n")[1]);
             }
-          },
-          error: xhr => {
-              alert(xhr.responseText.split('\n')[1])
-          }
-          })
-          counter = counter +1;
-          $('#mon_image').attr('src', "https://image.tmdb.org/t/p/w500/" + film_sample[counter]['poster_path']);
-          $('#title').replaceWith( "<div id='title'><h3>" + film_sample[counter]['name'] + '</h3></div>');
-          $('#description').replaceWith("<div id='description' class='h-50'><p>" + film_sample[counter]['overview'] + '</p></div>')
+          });
+          counter = counter + 1;
+          $("#mon_image").attr(
+            "src",
+            "https://image.tmdb.org/t/p/w500/" +
+              film_sample[counter]["poster_path"]
+          );
+          $("#title").replaceWith(
+            "<div id='title'><h3>" +
+              film_sample[counter]["name"] +
+              "</h3></div>"
+          );
+          $("#description").replaceWith(
+            "<div id='description' class='h-50'><p>" +
+              film_sample[counter]["overview"] +
+              "</p></div>"
+          );
         }
       }
-    })
     });
+  });
 </script>
 {% endblock script %}

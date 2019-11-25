@@ -31,11 +31,14 @@ def home():
 def index():
     return render_template("index.html")
 
+
 @app.route("/send_mail")
 def send_mail():
     from cronjobs.celery import send_mail_user
-    send_mail_user.delay(session['username'], session['id'])
-    return 'done'
+
+    send_mail_user.delay(session["username"], session["id"])
+    return "done"
+
 
 # First ratings after signup
 @app.route("/first_ratings", methods=["GET"])
@@ -61,10 +64,10 @@ def first_ratings():
 # Movies pages
 @app.route("/movies", methods=["GET"])
 def movies():
-    if 'username' not in session or 'id' not in session:
-        return redirect(url_for('index'))
-    reco_movies = recommend_movies(session['id'], 80)[1]
-    dict_reco_movies = reco_movies.to_dict('records')
+    if "username" not in session or "id" not in session:
+        return redirect(url_for("index"))
+    reco_movies = recommend_movies(session["id"], 80)[1]
+    dict_reco_movies = reco_movies.to_dict("records")
     genres_list = []
     movies_by_genre = {}
     for genre in genres_db.find():
@@ -159,6 +162,12 @@ def tvshow(tvshow_id):
     user = User.get(username=session["username"])
     rating = Ratings.get(cinema=tvshow_id, user=user._mongo_id)
     my_rating = rating._rating if rating else "Not rated yet"
+    tvshow.pop("ratings")
+    for i, season in enumerate(tvshow["seasons"]):
+        tvshow["seasons"][i]["verbose_name"] = tvshow["seasons"][i]["name"]
+        tvshow["seasons"][i]["name"] = (
+            tvshow["seasons"][i]["name"].replace(" ", "").replace("&", "")
+        )
     return render_template("tvshow.html", tvshow=tvshow, my_rating=my_rating)
 
 

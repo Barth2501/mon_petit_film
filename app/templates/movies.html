@@ -162,10 +162,16 @@
 {% endfor %} {% endblock content %} {% block script %}
 <script>
   $(document).ready(function() {
-    $('#carousel_reco').find('.carousel-item').first().addClass('active')
-    for (const genre of {{ genres_list|tojson }}) {
-      $('#carousel' + genre.name).find('.carousel-item').first().addClass('active')
+    $("#carousel_reco")
+      .find(".carousel-item")
+      .first()
+      .addClass("active");
+    for (const genre of JSON.parse(`{{ genres_list|tojson }}`)) {
+      $("#carousel" + genre.name)
+        .find(".carousel-item")
+        .first()
+        .addClass("active");
     }
-  })
+  });
 </script>
 {% endblock script %}
