@@ -30,6 +30,16 @@ class DAO:
         ]
 
     @classmethod
+    def filter_and_sort(cls, sort, limit=0, **kwargs):
+        filters = {}
+        for key in kwargs.keys():
+            filters[key.replace("__", ".")] = kwargs[key]
+        return [
+            cls(**instance)
+            for instance in db[cls._collection].find(filters).sort(sort).limit(limit)
+        ]
+
+    @classmethod
     def filter_json(cls, limit=0, **kwargs):
         filters = {}
         for key in kwargs.keys():
