@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  mon_petit_film:
+    build: ./
+    ports:
+      - 8000:5000
+    command: "python manage.py runserver"
+  cronjobs:
+    build: ./
+    command: "celery -A cronjobs.celery.celery_app worker -B --loglevel=info"
+  redis:
+    image: redis:latest
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]

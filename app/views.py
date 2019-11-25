@@ -11,6 +11,8 @@ from flask_mail import Mail
 import app.config as config
 from celery import Celery
 
+
+
 app = Flask(__name__)
 app.config.from_object(config)
 
@@ -100,6 +102,9 @@ def add_rating():
 
 @app.route('/movies', methods=['GET'])
 def movies():
+    from app.celery import hello
+    
+    hello.delay()
     if 'username' not in session or 'id' not in session:
         return redirect(url_for('index'))
     reco_movies = recommend_movies(session['id'], 80)[1]

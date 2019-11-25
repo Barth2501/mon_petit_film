@@ -4,7 +4,7 @@ app="mon_petit_film"
 docker container kill mon_petit_film
 docker rm mon_petit_film
 docker build -t ${app} -f Dockerfile .
-docker run -p 8000:80 \
+docker run -p 8000:5000 \
   --name=${app} \
   -v $PWD:/app ${app}
 
