@@ -21,5 +21,4 @@ def send_mail_flask():
         msg.html = render_template(
             "mail.html", dict_reco_movies=dict_reco_movies, user=user.json
         )
-        mail.send(msg)
-
+        mail.send(msg)  

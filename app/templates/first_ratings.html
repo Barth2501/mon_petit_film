@@ -65,6 +65,9 @@
           data: JSON.stringify({'cinemaId':film_sample[counter]['id'],'rating':value}),
           success: res => {
             if (counter == film_sample.length) {
+              $.ajax({
+                url: "{{ url_for('send_mail') }}",
+              })
               window.location.href="{{ url_for('index') }}"
             }
           },
