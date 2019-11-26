@@ -41,7 +41,7 @@ def first_ratings():
     poster_sample = []
     id_sample = []
     while len(film_sample) < 10:
-        film = movies[random.randint(1, len(movies))].json
+        film = movies[random.randint(0, len(movies)-1)].json
         film.pop("ratings")
         film_sample.append(film)
         poster_sample.append(film["poster_path"])
