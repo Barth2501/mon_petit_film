@@ -1,8 +1,11 @@
+# All the congig that are used in the app lie there
+
 from celery.schedules import crontab
 
 CELERY_BROKER_URL = "redis://redis:6379/0"
 CELERY_RESULT_BACKEND = "redis://redis:6379/0"
-CELERY_IMPORTS = ("cronjobs.tasks.test", "cronjobs.tasks.send_mail")
+CELERY_IMPORTS = ("cronjobs.tasks.send_mail")
+# Here is the config for the celery beat cronjob
 CELERYBEAT_SCHEDULE = {
     "send-mail-on-monday": {
         "task": "cronjobs.tasks.send_mail.send_mail_flask",
