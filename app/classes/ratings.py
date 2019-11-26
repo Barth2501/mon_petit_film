@@ -2,6 +2,10 @@ from app.classes.dao import DAO
 from bson.objectid import ObjectId
 
 
+# The class Ratings is a child of DAO in order to be able to interact with database.
+# It uses the collection 'ratings'
+# A rating is the link between a user and a movie/tvshow, with an associated value
+# We redefine here some DAO methods because it does not work the same way for ratings
 class Ratings(DAO):
     _collection = "ratings"
 
@@ -13,6 +17,7 @@ class Ratings(DAO):
         self._user = kwargs.get("user", None)
         self._cinema = kwargs.get("cinema", None)
 
+    # when saving a new rating, we add it to its relative user and cinema instances
     def save(self):
         self._user._addRating(self._cinema._id, self._rating)
         self._cinema._addRating(self._user._mongo_id, self._rating)

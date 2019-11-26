@@ -3,6 +3,10 @@ from bson.objectid import ObjectId
 from statistics import mean
 
 
+# The class Cinema is a child of DAO in order to be able to interact with database.
+# It is an "abstract" class, we never create Cinema instance (though it is possible)
+# We instanciate in this class every needed properties and methods for movies and tvshows.
+# It has two childs, Movie and TVShow which use all properties from Cinema
 class Cinema(DAO):
     _collection = "cinema"
 
@@ -27,6 +31,8 @@ class Cinema(DAO):
         )
         self._ratings = kwargs.get("ratings", [])
 
+    # Method used to add a rating to a movie/tvshow. It also updates the global rating of the instance
+    # it is called when saving a rating in database
     def _addRating(self, userId, rating):
         # check if user already rated this cinema instance, and update/insert rating consequently
         alreadyExist = type(self).get(id=self._id, ratings__user=userId)
@@ -68,6 +74,8 @@ class Cinema(DAO):
         return str(self._mongo_id)
 
 
+# Movie class, child of Cinema.
+# Use mongo collection 'movies'
 class Movie(Cinema):
     _collection = "movies"
 
@@ -75,6 +83,7 @@ class Movie(Cinema):
         Cinema.__init__(self, name, **kwargs)
         self._runtime = kwargs.get("runtime", 0)
 
+    # json property returns for an instance a dictionnary of all useful properties
     @property
     def json(self):
         return {
@@ -96,6 +105,8 @@ class Movie(Cinema):
         }
 
 
+# TVShow class, child of Cinema.
+# Use mongo collection 'tvshows'
 class TVShow(Cinema):
     _collection = "tvshows"
 
@@ -104,6 +115,7 @@ class TVShow(Cinema):
         self._seasons = kwargs.get("seasons", [])
         self._episodeLength = kwargs.get("episodeLength", "")
 
+    # json property returns for an instance a dictionnary of all useful properties
     @property
     def json(self):
         return {
@@ -124,6 +136,7 @@ class TVShow(Cinema):
             "seasons": self._seasons,
         }
 
+    # method to add a season object to a tvshow instance and save in db
     def _addSeasonToDB(self, season):
         # update seasons current state in database
         instance_from_db = self
@@ -149,6 +162,7 @@ class TVShow(Cinema):
                 },
             )
 
+    # method to add an episode object to a tvshow instance and save in db
     def _addEpisodeToDB(self, episode, season):
         # update seasons current state in database
         instance_from_db = self
@@ -180,6 +194,8 @@ class TVShow(Cinema):
             )
 
 
+# Class Season, similar to Cinema but not a child of DAO
+# Used only to format properties and add it to a tvshow instance
 class Season:
     def __init__(self, name, number, tvShow, **kwargs):
         self._name = name
@@ -195,9 +211,11 @@ class Season:
         self._episodes = kwargs.get("episodes", [])
         self._tvShow = tvShow
 
+    # method to add an episode instance to a season instance (no database interaction)
     def _addEpisode(self, episode):
         self._episodes.append(episode.json)
 
+    # json property returns for an instance a dictionnary of all useful properties
     @property
     def json(self):
         return {
@@ -215,6 +233,8 @@ class Season:
         }
 
 
+# Class Season, similar to Cinema but not a child of DAO
+# Used only to format properties and add it to a season/tvshow instance
 class Episode:
     def __init__(self, name, number, season, **kwargs):
         self._name = name
@@ -231,6 +251,7 @@ class Episode:
         self._season = season
         self._tvShow = season._tvShow
 
+    # json property returns for an instance a dictionnary of all useful properties
     @property
     def json(self):
         return {

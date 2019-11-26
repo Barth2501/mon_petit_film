@@ -2,6 +2,10 @@ from app.classes.dao import DAO
 from bson.objectid import ObjectId
 
 
+# The class User is a child of DAO in order to be able to interact with database.
+# It uses the collection 'user'
+# A user has an username, an email, a password and a list of ratings
+# We redefine here some DAO methods because it does not work the same way for ratings
 class User(DAO):
     _collection = "user"
 
@@ -32,6 +36,8 @@ class User(DAO):
             deleted_in_db = True
         return deleted_in_db
 
+    # method to add a rating to user instance.
+    # it is called when saving a rating in database
     def _addRating(self, cinemaId, rating):
         if not self._mongo_id:
             instance_from_db = User.get(username=self._username)
@@ -54,10 +60,6 @@ class User(DAO):
                 )
 
     @property
-    def mongo_id(self):
-        return str(self._mongo_id)
-
-    @property
     def json(self):
         return {
             "username": self._username,
@@ -65,6 +67,10 @@ class User(DAO):
             "password": self._password,
             "ratings": self._ratings,
         }
+
+    @property
+    def mongo_id(self):
+        return str(self._mongo_id)
 
     @property
     def username(self):

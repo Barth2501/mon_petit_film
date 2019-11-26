@@ -1,10 +1,16 @@
 from pymongo import MongoClient
 
+# We use a mongo database hosted on heroku, and interact with it using the DAO class
 URI = "mongodb://heroku_1hj3v1h2:hiiq0l9nuj1fdffsqffr6spc1p@ds113799.mlab.com:13799/heroku_1hj3v1h2?retryWrites=false"
 client = MongoClient(URI)
 db = client.get_default_database()
 
 
+# DAO is a class used as an interface to call mongo database from python.
+# It is an "abstract" class, we never create DAO instance (though it is possible)
+# When creating an instance of movie / tvshow, being a child of DAO all functions can be used,
+#   it allows us to call save or delete method straight from the movie instance
+# We also use its class methods directly to find a specific movie/tvshow, update... in the matching database
 class DAO:
     _collection = None
 
