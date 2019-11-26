@@ -48,7 +48,7 @@
       "https://image.tmdb.org/t/p/w500/{{film_sample[0]['poster_path']}}"
     );
     var counter = 0;
-    var film_sample = JSON.parse(`{{film_sample|tojson}}`);
+    var film_sample = {{film_sample|tojson}};
     $("#unseen").on("click", function() {
       counter = counter + 1;
       if (counter == film_sample.length) {
