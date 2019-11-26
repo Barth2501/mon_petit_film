@@ -288,7 +288,7 @@ def search_in_db():
     ):
         return url_for("movie", movie_id=str(movie_found._id))
     if (not movie_found) or (
-        tvhsow_found and movie_found._vote_count < tvshow_found._vote_count
+        tvshow_found and movie_found._vote_count < tvshow_found._vote_count
     ):
         return url_for("tvshow", tvshow_id=str(tvshow_found._id))
     # if similar, return movie
