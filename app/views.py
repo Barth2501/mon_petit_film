@@ -32,14 +32,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/send_mail")
-def send_mail():
-    from cronjobs.celery import send_mail_user
-
-    send_mail_user.delay(session["username"], session["id"])
-    return "done"
-
-
 # First ratings after signup
 @app.route("/first_ratings", methods=["GET"])
 def first_ratings():
@@ -223,6 +215,15 @@ def logout():
     session.pop("username", None)
     session.pop("id", None)
     return redirect(url_for("index"))
+
+
+# Send reco mail to new user
+@app.route("/send_mail")
+def send_mail():
+    from cronjobs.celery import send_mail_user
+
+    send_mail_user.delay(session["username"], session["id"])
+    return "done"
 
 
 # Add rating
