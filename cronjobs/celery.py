@@ -7,6 +7,8 @@ from app.classes.user import User
 from flask import render_template
 
 
+# This function is to create the Celery app and to link it with the flask app previously set
+
 def make_celery(app):
     celery = Celery(
         app.import_name,
@@ -32,6 +34,8 @@ def make_celery(app):
 
 celery_app = make_celery(app)
 
+# This tasks is to send an email with his recommended movies to every new user who just registered
+# Its construction is the same as the one scheduled on monday appart the fact that it is for only on user
 
 @celery_app.task
 def send_mail_user(username, id):
@@ -41,7 +45,6 @@ def send_mail_user(username, id):
     msg = Message(
         subject="Recommended movies", recipients=[user.json["emailAddress"]]
     )
-    # msg.body = render_template(template+'.txt', **kwargs)
     msg.html = render_template(
         "mail.html", dict_reco_movies=dict_reco_movies, user=user.json
     )

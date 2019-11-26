@@ -6,10 +6,14 @@ from app.classes.user import User
 from app.svd import recommend_movies
 
 
+# task that is scheduled on every monday morning at 8 am
+# It sends an email to every registered user with his recommended movies
+
 @shared_task
 def send_mail_flask():
     for user in User.all():
         try:
+            # We run the recommend_movies function from the svd.py file for every users
             reco_movies = recommend_movies(user.mongo_id, 5)[1]
         except ValueError:
             continue
@@ -17,7 +21,6 @@ def send_mail_flask():
         msg = Message(
             subject="Recommended movies", recipients=[user.json["emailAddress"]]
         )
-        # msg.body = render_template(template+'.txt', **kwargs)
         msg.html = render_template(
             "mail.html", dict_reco_movies=dict_reco_movies, user=user.json
         )

@@ -1,14 +1,17 @@
 version: '2'
 
 services:
+  # app 'mon_petit_film' docker for the back and front end 
   mon_petit_film:
     build: ./
     ports:
       - 8000:5000
     command: "python manage.py runserver"
+  # celery docker that run the cronjobs 
   cronjobs:
     build: ./
     command: "celery -A cronjobs.celery.celery_app worker -B --loglevel=info"
+  # redis server that allows celery to send tasks
   redis:
     image: redis:latest
     command: ["redis-server", "--bind", "redis", "--port", "6379"]

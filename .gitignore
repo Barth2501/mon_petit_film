@@ -3,4 +3,5 @@ __pycache__
 virtualenv
 .env
 *.pyc
+celerybeat-schedule
 venv
