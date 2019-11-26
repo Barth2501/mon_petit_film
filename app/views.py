@@ -62,6 +62,7 @@ def movies():
     dict_reco_movies = reco_movies.to_dict("records")
     genres_list = []
     movies_by_genre = {}
+    # on commence par ajouter les films recommandés pour chaque genre
     for genre in genres_db.find():
         genre.pop("_id")
         genre["verbose_name"] = genre["name"]
@@ -69,7 +70,6 @@ def movies():
         count = 0
         movies_by_genre[genre["name"]] = []
         for i, g in enumerate(reco_movies["genres"].iteritems()):
-            # s'occuper de tous les genres existants pour un film
             for j in range(min(2, len(g[1]))):
                 if g[1][j]["id"] == genre["id"]:
                     movies_by_genre[genre["name"]].append(
@@ -85,7 +85,7 @@ def movies():
     )
     for genre in genres_list_pop:
         movies_by_genre.pop(genre["name"])
-    # rajouter des films random si pas assez de ce type avec la prediction
+    # rajouter des films random si pas assez de ce genre avec la prediction
     for genre in genres_list:
         if len(movies_by_genre[genre["name"]]) < 15:
             for movie in Movie.filter(
@@ -93,7 +93,6 @@ def movies():
                 limit=15 - len(movies_by_genre[genre["name"]]),
             ):
                 movies_by_genre[genre["name"]].append(movie.json)
-
     return render_template(
         "movies.html",
         dict_reco_movies=dict_reco_movies,
@@ -106,6 +105,7 @@ def movies():
 def movie(movie_id):
     if "username" not in session or "id" not in session:
         return redirect(url_for("index"))
+    # on récupère le film demandé et les ratings associés
     movie = Movie.get(id=movie_id).json
     movie["globalRating"] = (
         float("{0:.2f}".format(movie["globalRating"]))
@@ -125,13 +125,13 @@ def tvshows():
         return redirect(url_for("index"))
     genres_list = []
     tvshows_by_genre = {}
+    # on récupère pour chaque genre les séries les plus connues (reco que pour les films)
     for genre in genres_tvshow_db.find():
         genre.pop("_id")
         genre["verbose_name"] = genre["name"]
         genre["name"] = genre["name"].replace(" ", "").replace("&", "")
         genres_list.append(genre)
         tvshows_by_genre[genre["name"]] = []
-        # add well-known tv shows (no reco for tv shows)
         for tvshow in TVShow.filter_and_sort(
             genres=genre["id"], limit=15, sort=[("vote_count", -1)]
         ):
@@ -145,6 +145,7 @@ def tvshows():
 def tvshow(tvshow_id):
     if "username" not in session or "id" not in session:
         return redirect(url_for("index"))
+    # on récupère la série demandée et les ratings associés
     tvshow = TVShow.get(id=tvshow_id).json
     tvshow["globalRating"] = (
         float("{0:.2f}".format(tvshow["globalRating"]))
