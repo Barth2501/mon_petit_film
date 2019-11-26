@@ -2,11 +2,12 @@ from flask import render_template, redirect, url_for, Flask, request, session, f
 from flask_pymongo import PyMongo
 from app.classes.user import User
 from app.classes.ratings import Ratings
-from app.classes.movies_and_series import Movie, TVShow
+from app.classes.movies_and_series import Cinema, Movie, TVShow
 from app.svd import recommend_movies
 import random
 from flask_mail import Mail
 import app.config as config
+import re
 
 
 app = Flask(__name__)
@@ -248,12 +249,47 @@ def search_in_db():
     if "username" not in session:
         return "Not logged in"
     query = request.json["query"]
-    movie_found = Movie.get(name=query)
-    if movie_found:
-        return url_for("movie", movie_id=str(movie_found._id))
-    tvshow_found = TVShow.get(name=query)
-    if tvshow_found:
-        return url_for("tvshow", tvshow_id=str(tvshow_found._id))
-    else:
+    # search for the best matching movie and tv show
+    name = re.compile("^" + re.escape(query) + "$", re.IGNORECASE)
+    movie_found = Movie.get(name=name)
+    if not movie_found:
+        name = re.compile("^" + re.escape(query), re.IGNORECASE)
+        movies_found = Movie.filter_and_sort(name=name, sort=[("vote_count", -1)])
+        if len(movies_found):
+            movie_found = movies_found[0]
+        if not movie_found:
+            name = re.compile(re.escape(query), re.IGNORECASE)
+            movies_found = Movie.filter_and_sort(name=name, sort=[("vote_count", -1)])
+            if len(movies_found):
+                movie_found = movies_found[0]
+    tvshow_found = TVShow.get(name=name)
+    if not tvshow_found:
+        name = re.compile("^" + re.escape(query), re.IGNORECASE)
+        tvshows_found = TVShow.filter_and_sort(name=name, sort=[("vote_count", -1)])
+        if len(tvshows_found):
+            tvshow_found = tvshows_found[0]
+        if not tvshow_found:
+            name = re.compile(re.escape(query), re.IGNORECASE)
+            tvshows_found = TVShow.filter_and_sort(name=name, sort=[("vote_count", -1)])
+            if len(tvshows_found):
+                tvshow_found = tvshows_found[0]
+    # return the best query matching between two results
+    if movie_found and tvshow_found:
+        if movie_found._name.lower() != tvshow_found._name.lower():
+            if movie_found._name.lower() == query.lower():
+                return url_for("movie", movie_id=str(movie_found._id))
+            if tvshow_found._name.lower() == query.lower():
+                return url_for("tvshow", tvshow_id=str(tvshow_found._id))
+    # return the one with higher vote_count
+    if (not movie_found) and (not tvshow_found):
         return "not found"
-
+    if (not tvshow_found) or (
+        movie_found and movie_found._vote_count > tvshow_found._vote_count
+    ):
+        return url_for("movie", movie_id=str(movie_found._id))
+    if (not movie_found) or (
+        tvhsow_found and movie_found._vote_count < tvshow_found._vote_count
+    ):
+        return url_for("tvshow", tvshow_id=str(tvshow_found._id))
+    # if similar, return movie
+    return url_for("movie", movie_id=str(movie_found._id))
