@@ -40,24 +40,16 @@
         data-ride="carousel"
       >
         <ol class="carousel-indicators">
+          {% for i in range(season['number_of_slides']) %}
           <li
             data-target="#carousel{{season['name']}}"
-            data-slide-to="0"
-            class="bg-secondary active"
-          ></li>
-          <li
-            data-target="#carousel{{season['name']}}"
-            data-slide-to="1"
+            data-slide-to="{{i}}"
             class="bg-secondary"
           ></li>
-          <li
-            data-target="#carousel{{season['name']}}"
-            data-slide-to="2"
-            class="bg-secondary"
-          ></li>
+          {% endfor %}
         </ol>
         <div class="carousel-inner" role="listbox">
-          {% for i in range(3) %}
+          {% for i in range(season['number_of_slides']) %}
           <div class="carousel-item" style="height:inherit">
             <div class="row">
               <div class="col-md-1"></div>
@@ -130,9 +122,14 @@
   $(document).ready(function() {
     const tvshow = JSON.parse(`{{ tvshow|tojson }}`);
     for (const season of tvshow["seasons"]) {
-      console.log("#carousel" + season.name);
-      $("#carousel" + season.name)
+      const carousel = $("#carousel" + season.name);
+      carousel
         .find(".carousel-item")
+        .first()
+        .addClass("active");
+      carousel
+        .find(".carousel-indicators")
+        .find("li")
         .first()
         .addClass("active");
     }

@@ -162,11 +162,17 @@ def tvshow(tvshow_id):
     user = User.get(username=session["username"])
     rating = Ratings.get(cinema=tvshow_id, user=user._mongo_id)
     my_rating = rating._rating if rating else "Not rated yet"
+    # deal with all potentials javascript parsing problems
     tvshow.pop("ratings")
+    tvshow["overview"] = tvshow["overview"].replace('"', "'")
     for i, season in enumerate(tvshow["seasons"]):
-        tvshow["seasons"][i]["verbose_name"] = tvshow["seasons"][i]["name"]
-        tvshow["seasons"][i]["name"] = (
-            tvshow["seasons"][i]["name"].replace(" ", "").replace("&", "")
+        tvshow["seasons"][i]["verbose_name"] = season["name"]
+        tvshow["seasons"][i]["name"] = season["name"].replace(" ", "").replace("&", "")
+        tvshow["seasons"][i].pop("overview")
+        for j in range(len(season["episodes"])):
+            tvshow["seasons"][i]["episodes"][j].pop("overview")
+        tvshow["seasons"][i]["number_of_slides"] = int(
+            (len(season["episodes"]) + 4) / 5
         )
     return render_template("tvshow.html", tvshow=tvshow, my_rating=my_rating)
 
