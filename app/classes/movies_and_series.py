@@ -28,15 +28,24 @@ class Cinema(DAO):
         self._ratings = kwargs.get("ratings", [])
 
     def _addRating(self, userId, rating):
+        # check if user already rated this cinema instance, and update/insert rating consequently
+        alreadyExist = type(self).get(id=self._id, ratings__user=userId)
+        if alreadyExist:
+            type(self).update_one(
+                {"_id": alreadyExist._mongo_id, "ratings.user": userId},
+                {"$set": {"ratings.$.rating": rating}},
+            )
+        else:
+            newRating = {"user": userId, "rating": rating}
+            self._ratings.append(newRating)
+            self.save()
         # update instance with data from database
-        if not self._mongo_id:
-            instance_from_db = type(self).get(name=self._name)
-            if instance_from_db:
-                self._mongo_id = instance_from_db._mongo_id
-                self._ratings = instance_from_db._ratings
-        # add new rating
-        newRating = {"user": userId, "rating": rating}
-        self._ratings.append(newRating)
+        instance_from_db = type(self).get(id=self._id)
+        if instance_from_db:
+            self._mongo_id = instance_from_db._mongo_id
+            self._ratings = instance_from_db._ratings
+            self._vote_average = instance_from_db._vote_average
+            self._vote_count = instance_from_db._vote_count
         # compute global rating using a reduced weight for vote_average from api
         self._globalRating = mean(rating["rating"] for rating in self._ratings)
         ratings_count = len(self._ratings)
@@ -45,27 +54,10 @@ class Cinema(DAO):
         self._globalRating = (
             ratings_count * self._globalRating + vote_count * vote_average
         ) / (ratings_count + vote_count)
-        # if already rated by this user, change old rating - else just add the new one
-        alreadyExist = type(self).get(id=self._id, ratings__user=userId)
-        if alreadyExist:
-            if self._mongo_id:
-                return type(self).update_one(
-                    {"_id": self._mongo_id, "ratings.user": userId},
-                    {
-                        "$set": {
-                            "ratings.$.rating": rating,
-                            "globalRating": self._globalRating,
-                        }
-                    },
-                )
-        if self._mongo_id:
-            return type(self).update_one(
-                {"_id": self._mongo_id},
-                {
-                    "$push": {"ratings": newRating},
-                    "$set": {"globalRating": self._globalRating},
-                },
-            )
+        # update global rating in database
+        return type(self).update_one(
+            {"_id": self._mongo_id}, {"$set": {"globalRating": self._globalRating}},
+        )
 
     @property
     def name(self):

@@ -1,18 +1,21 @@
-<!DOCTYPE html>
 {% extends 'base_template.html'%} {% block content %}
 <div class="row">
-  <p class="ml-auto mr-auto" style="text-align:center;font-family:garamond">
-    Hi {{ session['username'] }}! You can search here forvany movie or tv
-    show.<br />You can also jump straight to one of these categories!
-  </p>
-</div>
-<div class="row justify-content-around">
-  <a class="btn btn-lg btn-dark" href="{{ url_for('movies') }}">Movies</a>
-  <input
-    style="max-width:35%;"
-    class="form-control"
-    placeholder="Search here..."
+  <img
+    class="ml-auto mr-auto"
+    src="static/logo/MBM_global.png"
+    style="max-width:100%;height:auto;"
   />
-  <a class="btn btn-lg btn-dark" href="/tv-shows">TV Shows</a>
+</div>
+<div class="row">
+  <h3 class="ml-auto mr-auto" style="font-family:verdana">
+    The most reliable Movies & TV Shows database
+  </h3>
+</div>
+<div class="row" style="height:2vh"></div>
+<div class="row">
+  <h4 class="ml-auto mr-auto">
+    Page not implemented yet... Come back later to find here all of your
+    favorites movies and tv shows !
+  </h4>
 </div>
 {% endblock content %}

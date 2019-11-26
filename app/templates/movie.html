@@ -31,7 +31,6 @@
   .starrr {
     display: inline-block;
   }
-
   .starrr a {
     font-size: 26px;
     padding: 4px;
@@ -44,32 +43,34 @@
 </style>
 {% endblock content %} {% block script %}
 <script src="../static/js/addons/rating.js"></script>
-
 <script>
-    $(document).ready(function () {
-      $('#star1').starrr({
-        change: function (e, value) {
-          if (value) {
-            $.ajax({
-              url: "{{ url_for('add_rating') }}",
-              type: 'POST',
-              contentType: 'application/json;charset=UTF-8',
-              data: JSON.stringify({'cinemaId':{{ movie['id'] }},'rating':value}),
-              error: xhr => {
-                  alert(xhr.responseText.split('\n')[1])
-              }
-            })
-            $.alert({
-              icon: 'fa fa-check',
-              title: 'Thanks!',
-              content: 'We registered your rating!',
-              onClose: function () {
-                return location.reload()
-              }
-            })
-          }
+  $(document).ready(function() {
+    $("#star1").starrr({
+      change: function(e, value) {
+        if (value) {
+          $.ajax({
+            url: "{{ url_for('add_rating') }}",
+            type: "POST",
+            contentType: "application/json;charset=UTF-8",
+            data: JSON.stringify({
+              cinemaId: JSON.parse(`{{ movie['id'] }}`),
+              rating: value
+            }),
+            error: xhr => {
+              alert(xhr.responseText.split("\n")[1]);
+            }
+          });
+          $.alert({
+            icon: "fa fa-check",
+            title: "Thanks!",
+            content: "We registered your rating!",
+            onClose: function() {
+              return location.reload();
+            }
+          });
         }
-      })
-  })
+      }
+    });
+  });
 </script>
 {% endblock script %}
