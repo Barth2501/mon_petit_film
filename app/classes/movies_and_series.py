@@ -31,7 +31,8 @@ class Cinema(DAO):
         )
         self._ratings = kwargs.get("ratings", [])
 
-    # Method used to rate a movie/tvshow. It also updates the global rating of the instance
+    # Method used to add a rating to a movie/tvshow. It also updates the global rating of the instance
+    # it is called when saving a rating in database
     def _addRating(self, userId, rating):
         # check if user already rated this cinema instance, and update/insert rating consequently
         alreadyExist = type(self).get(id=self._id, ratings__user=userId)
